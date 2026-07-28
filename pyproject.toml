@@ -1,0 +1,21 @@
+[project]
+name = "cube3s"
+version = "0.1.0"
+description = "MicroPython MQTT hobby app for M5Stack CoreS3"
+authors = [
+    {name = "Karol Kiszka", email = "karol.kiszka@pm.me"}
+]
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["micropython", "m5stack", "cores3", "esp32s3", "mqtt"]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/kiszkacy/cube3s"
+
+[dependency-groups]
+dev = [
+    "micropython-esp32-stubs>=1.28.0.post4",
+    "mpremote>=1.28.0",
+]
