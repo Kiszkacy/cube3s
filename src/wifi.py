@@ -12,7 +12,8 @@ def connect():
     wlan.active(True)
 
     if wlan.isconnected():
-        print(f"[WIFI] already connected.")
+        my_ip: str = wlan.ifconfig()[0]
+        print(f"[WIFI] already connected as {my_ip}.")
         return
 
     wlan.connect(WIFI__SSID, WIFI__PASSWORD)
