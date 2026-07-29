@@ -1,12 +1,12 @@
 
 
-def initialize():
+def initialize(): # called once when the module is switched to
     pass
 
 
-def deinitialize():
+def deinitialize(): # called once when the module is switched away from
     pass
 
 
-def update():
+def update(): # called on every loop iteration, around 20 times per second
     pass
