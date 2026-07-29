@@ -50,6 +50,8 @@ SWITCH_BUTTON_FILL_COLOR: int = 0xBBBBBB # gray
 SWITCH_BUTTON_BORDER_COLOR: int = 0xFFFFFF # white
 
 _mode: int = 0  # 0 => digital, 1 => analog
+_previous_mode: int = -1
+_previous_second: int = -1
 
 
 def on_mqtt_mode_switch(topic: str, message: str) -> None:
@@ -217,15 +219,24 @@ def draw_switch_mode_button():
 
 
 def update():
-    display.clear_canvas()
+    global _previous_mode, _previous_second
 
-    handle_touch()
+    handle_touch() # handle touch at every update loop
 
-    if _mode == 0:
-        draw_digital_clock()
-    elif _mode == 1:
-        draw_analog_clock()
-    draw_battery()
-    draw_switch_mode_button()
+    current_second: int = time.localtime()[5]
 
-    display.flush_canvas()
+    if _previous_mode != _mode or _previous_second != current_second:
+        _previous_mode = _mode
+        _previous_second = current_second
+
+        # redraw only if mode changed or second changed to avoid unnecessary redraws
+        display.clear_canvas()
+
+        if _mode == 0:
+            draw_digital_clock()
+        elif _mode == 1:
+            draw_analog_clock()
+        draw_battery()
+        draw_switch_mode_button()
+
+        display.flush_canvas()
