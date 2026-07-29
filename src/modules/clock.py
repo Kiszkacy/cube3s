@@ -54,7 +54,7 @@ _previous_mode: int = -1
 _previous_second: int = -1
 
 
-def on_mqtt_mode_switch(topic: str, message: str) -> None:
+def on_mqtt_mode_switch(topic: str, message: str):
     global _mode
     message_: str = message.lower().strip()
     if message_ in ("0", "digital"):
@@ -66,12 +66,13 @@ def on_mqtt_mode_switch(topic: str, message: str) -> None:
     print(f"[CLOCK.MQTT] mode switched to: {'digital' if _mode == 0 else 'analog'}.")
     
 
-def on_mqtt_brightness(topic: str, message: str) -> None:
+def on_mqtt_brightness(topic: str, message: str):
     try:
-        level: int = int(message)
-        display.set_brightness(max(0, min(255, level)))
+        brightness: int = int(message)
+        clamped_brightness: int = max(10, min(255, brightness))
+        display.set_brightness(clamped_brightness)
     except ValueError:
-        pass
+        return
     print(f"[CLOCK.MQTT] brightness set to: {display.get_brightness()}.")
 
 
