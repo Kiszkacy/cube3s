@@ -13,6 +13,7 @@ MODULES: dict = {
     "input": dashboard,
 }
 
+# TODO: implement helper time module and daily reset logic
 
 _current_module: str | None = None
 
@@ -41,6 +42,7 @@ mqtt.connect()
 mqtt.register_handler(MQTT__MODULE_SWITCH_TOPIC, on_module_switch)
 
 print(f"[MAIN] starting main loop.")
+# TODO: measure frame time and loop execution time
 while True:
     M5.update()
     mqtt.check_if_any_message()

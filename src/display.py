@@ -26,9 +26,9 @@ _ANCHOR_MAP: dict[str, object] = {
 
 # TODO: font dict
 
-def initialize_canvas(w: int = WIDTH, h: int = HEIGHT) -> None:
+def initialize_canvas(width: int = WIDTH, height: int = HEIGHT) -> None:
     global _canvas, _target
-    _canvas = _display.newCanvas(w, h)
+    _canvas = _display.newCanvas(width, height)
 
 
 def use_canvas() -> None:
@@ -91,8 +91,11 @@ def draw_pixel(x: int, y: int, color: int = 0xFFFFFF):
     _target.drawPixel(x, y, color)
 
 
-def draw_line(x_from: int, y_from: int, x_to: int, y_to: int, color: int = 0xFFFFFF):
-    _target.drawLine(x_from, y_from, x_to, y_to, color)
+def draw_line(x_from: int, y_from: int, x_to: int, y_to: int, color: int = 0xFFFFFF, width: int = 1):
+    if width <= 1:
+        _target.drawLine(x_from, y_from, x_to, y_to, color)
+    else:
+        _target.drawWideLine(x_from, y_from, x_to, y_to, width, color)
 
 # TODO: add fast horizontal/vertical line draws
 # TODO: add helper anchor points args for shapes ?
