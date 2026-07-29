@@ -31,8 +31,9 @@ def handle_incoming_messages(topic: bytes, message: bytes):
         print(f"[MQTT] received unhandled topic: {topic_str} -> '{msg_str[:50]}'.")
 
 
-def register_handler(topic: str, method):
-    _message_handlers.setdefault(topic.encode('utf-8'), method)
+def register_handler(topic: str, function):
+    _message_handlers.setdefault(topic.encode('utf-8'), function)
+    print(f"[MQTT] registered handler for topic: {topic}")
 
 
 def initialize():
