@@ -12,6 +12,8 @@ MODULES: dict = {
     "clock": clock,
     "input": dashboard,
 }
+
+
 _current_module: str | None = None
 
 
