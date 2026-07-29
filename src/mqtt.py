@@ -26,9 +26,10 @@ def handle_incoming_messages(topic: bytes, message: bytes):
     msg_str: str = message.decode('utf-8')
 
     if topic in _message_handlers:
+        print(f"[MQTT] received: '{topic_str}' -> '{msg_str[:50]}', sending to a corresponding handler.")
         _message_handlers[topic](topic_str, msg_str)
     else:
-        print(f"[MQTT] received unhandled topic: {topic_str} -> '{msg_str[:50]}'.")
+        print(f"[MQTT] received unhandled topic: '{topic_str}' -> '{msg_str[:50]}'.")
 
 
 def register_handler(topic: str, function):

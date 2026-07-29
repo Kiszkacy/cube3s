@@ -41,6 +41,7 @@ wifi.connect()
 mqtt.initialize()
 mqtt.connect()
 mqtt.register_handler(MQTT__MODULE_SWITCH_TOPIC, on_module_switch)
+mqtt.subscribe(MQTT__MODULE_SWITCH_TOPIC)
 
 print(f"[MAIN] starting main loop.")
 # TODO: measure frame time and loop execution time

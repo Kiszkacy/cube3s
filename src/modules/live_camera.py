@@ -41,7 +41,7 @@ def update():
         _printed_error_message = True
         return
 
-    if touch.is_touched():
+    if touch.is_pressed():
         y: int = touch.y_position()
         brightness: int = int(255 * (1.0 - (y / display.HEIGHT)))
         clamped_brightness: int = max(10, min(255, brightness))

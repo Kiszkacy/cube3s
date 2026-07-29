@@ -10,11 +10,11 @@ import M5 # type: ignore
 
 # TODO: implement sound helper module and play sounds on mode switch
 
-DIGITAL_CLOCK_TEXT_SIZE: float = 4.0
+DIGITAL_CLOCK_TEXT_SIZE: float = 5.0
 DIGITAL_CLOCK_COLOR: int = 0xFFFFFF # white
 
 ANALOG_CLOCK_CENTER_X: int = display.WIDTH // 2
-ANALOG_CLOCK_CENTER_Y: int = (display.HEIGHT - 10) // 2
+ANALOG_CLOCK_CENTER_Y: int = display.HEIGHT // 2
 ANALOG_CLOCK_RADIUS: int = 100
 ANALOG_CLOCK_HOUR_HAND_LENGTH: int = 50
 ANALOG_CLOCK_MINUTE_HAND_LENGTH: int = 70
@@ -46,7 +46,7 @@ SWITCH_BUTTON_WIDTH: int = 60
 SWITCH_BUTTON_HEIGHT: int = 40
 SWITCH_BUTTON_X: int = display.WIDTH - SWITCH_BUTTON_WIDTH - 10
 SWITCH_BUTTON_Y: int = display.HEIGHT - SWITCH_BUTTON_HEIGHT - 10
-SWITCH_BUTTON_FILL_COLOR: int = 0xBBBBBB # gray
+SWITCH_BUTTON_FILL_COLOR: int = 0x004040 # dark cyan
 SWITCH_BUTTON_BORDER_COLOR: int = 0xFFFFFF # white
 
 _mode: int = 0  # 0 => digital, 1 => analog
@@ -99,21 +99,27 @@ def deinitialize():
 
 def handle_touch():
     global _mode
-    if not touch.is_touched():
+    if not touch.is_pressed():
         return
-    
+
     x, y = touch.position()
-    # inside switch button => switch mode
-    if (SWITCH_BUTTON_X <= x <= SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH) and (SWITCH_BUTTON_Y <= y <= SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT):
-        _mode = 1 - _mode
-    else: # outside switch button => adjust brightness
+    is_inside_button: bool = (SWITCH_BUTTON_X <= x <= SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH) and (
+            SWITCH_BUTTON_Y <= y <= SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT
+    )
+
+    if is_inside_button:
+        # inside switch button => switch mode
+        if touch.was_pressed():
+            _mode = 1 - _mode
+    else :
+        # outside switch button => adjust brightness
         brightness: int = int(255 * (1.0 - (y / display.HEIGHT)))
         clamped_brightness: int = max(10, min(255, brightness))
         display.set_brightness(clamped_brightness)
 
 
-def draw_digital_clock(hours: int, minutes: int, seconds: int):
-    now: time.struct_time = time.localtime()
+def draw_digital_clock():
+    now: time.struct_time = time.localtime(time.time() + UTC_OFFSET*3600)
     hours, minutes, seconds = now[3], now[4], now[5]
 
     display.draw_text(
@@ -127,7 +133,7 @@ def draw_digital_clock(hours: int, minutes: int, seconds: int):
 
 
 def draw_analog_clock():
-    now: time.struct_time = time.localtime()
+    now: time.struct_time = time.localtime(time.time() + UTC_OFFSET*3600)
     hours, minutes, seconds = now[3], now[4], now[5]
 
     display.draw_circle(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, ANALOG_CLOCK_RADIUS, color=ANALOG_CLOCK_BORDER_COLOR) # clock border
@@ -162,9 +168,10 @@ def draw_battery():
     # TODO: implement proper power helper module
     battery_level: int = M5.Power.getBatteryLevel()
     is_battery_charging: bool = M5.Power.isCharging()
+    is_usb_connected: bool = M5.Power.getVBUSVoltage() > 4000
 
     battery_color: int = BATTERY_BACKGROUND_COLOR
-    if is_battery_charging:
+    if is_battery_charging or is_usb_connected:
         battery_color = BATTERY_CHARGING_COLOR
     elif battery_level > 60:
         battery_color = BATTERY_HIGH_COLOR
@@ -215,7 +222,15 @@ def draw_switch_mode_button():
     )
 
     label: str = "ANA" if _mode == 0 else "DIG"
-    display.draw_text(label, x=SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH // 2, y=SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT // 2, size=2, anchor="middle_center")
+    display.draw_text(
+        label,
+        x=SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH // 2,
+        y=SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT // 2,
+        size=2,
+        anchor="middle_center",
+        color=0xFFFFFF,
+        background_color=SWITCH_BUTTON_FILL_COLOR
+    )
 
 
 def update():

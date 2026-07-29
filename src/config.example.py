@@ -1,3 +1,7 @@
+# === device consts
+
+UTC_OFFSET: int = 0
+
 # === WIFI consts
 
 WIFI__SSID: str = "YOUR_WIFI_SSD"
