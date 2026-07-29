@@ -4,13 +4,14 @@ import M5  # type: ignore
 
 import mqtt
 import wifi
-from modules import dashboard, clock
+from modules import clock, dashboard, live_camera
 from config import *
 
 # module switching logic
 MODULES: dict = {
     "clock": clock,
     "input": dashboard,
+    "live_camera": live_camera
 }
 
 # TODO: implement helper time module and daily reset logic

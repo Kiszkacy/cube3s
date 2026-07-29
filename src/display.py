@@ -1,4 +1,5 @@
 import M5 # type: ignore
+import image
 
 
 _display: M5.Display = M5.Display
@@ -75,7 +76,7 @@ def set_clear_color(color: int):
 
 
 # TODO: quite unoptimized, add a separate simple text drawing functions
-def text(text: str, x: int = 0, y: int = 0, size: float = 2.0, color: int = 0xFFFFFF, background_color: int = -1, anchor: str = "top_left", padding: int = 0):
+def draw_text(text: str, x: int = 0, y: int = 0, size: float = 2.0, color: int = 0xFFFFFF, background_color: int = -1, anchor: str = "top_left", padding: int = 0):
     _target.setTextSize(size)
     _target.setTextColor(color, background_color)
     if background_color != -1:
@@ -125,3 +126,7 @@ def draw_triangle(x0: int, y0: int, x1: int, y1: int, x2: int, y2: int, color: i
         _target.fillTriangle(x0, y0, x1, y1, x2, y2, color)
     else:
         _target.drawTriangle(x0, y0, x1, y1, x2, y2, color)
+
+
+def draw_image(image_: image.Image, width: int, height: int, x: int = 0, y: int = 0):
+    _target.show(image_, x, y, width, height)

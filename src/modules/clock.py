@@ -116,7 +116,7 @@ def draw_digital_clock(hours: int, minutes: int, seconds: int):
     now: time.struct_time = time.localtime()
     hours, minutes, seconds = now[3], now[4], now[5]
 
-    display.text(
+    display.draw_text(
         f"{hours:02}:{minutes:02}:{seconds:02}",
         x=display.WIDTH//2,
         y=display.HEIGHT//2,
@@ -215,7 +215,7 @@ def draw_switch_mode_button():
     )
 
     label: str = "ANA" if _mode == 0 else "DIG"
-    display.text(label, x=SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH // 2, y=SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT // 2, size=2, anchor="middle_center")
+    display.draw_text(label, x=SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH // 2, y=SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT // 2, size=2, anchor="middle_center")
 
 
 def update():
