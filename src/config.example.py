@@ -2,6 +2,7 @@
 
 WIFI__SSID: str = "YOUR_WIFI_SSD"
 WIFI__PASSWORD: str = "YOUR_WIFI_PASSWORD"
+WIFI__TIMEOUT_SECONDS: int = 10
 
 # === MQTT consts
 

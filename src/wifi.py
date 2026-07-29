@@ -4,29 +4,26 @@ import network
 
 from config import *
 
-TIMEOUT: int = 10
-
 
 def connect():
     wlan: network.WLAN = network.WLAN(network.STA_IF)
     wlan.active(True)
 
     if wlan.isconnected():
-        my_ip: str = wlan.ifconfig()[0]
+        my_ip: str = wlan.ipconfig('addr4')
         print(f"[WIFI] already connected as {my_ip}.")
         return
 
     wlan.connect(WIFI__SSID, WIFI__PASSWORD)
-    counter: int = TIMEOUT
+    counter: int = WIFI__TIMEOUT_SECONDS
     while counter > 0 and not wlan.isconnected():
         time.sleep(1)
         counter -= 1
         print(f"[WIFI] connecting...")
 
     if wlan.isconnected():
-        my_ip: str = wlan.ifconfig()[0]
+        my_ip: str = wlan.ipconfig('addr4')
         print(f"[WIFI] successfully connected as {my_ip}.")
-        return
     else:
         print(f"[WIFI] failed to connect.")
 
