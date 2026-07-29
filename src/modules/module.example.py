@@ -1,3 +1,10 @@
+# imports
+
+
+# consts
+
+
+# vars
 
 
 def initialize(): # called once when the module is switched to
@@ -6,6 +13,9 @@ def initialize(): # called once when the module is switched to
 
 def deinitialize(): # called once when the module is switched away from
     pass
+
+
+# functions
 
 
 def update(): # called on every loop iteration, around 20 times per second
