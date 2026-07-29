@@ -104,8 +104,9 @@ def handle_touch():
         return
 
     x, y = touch.position()
-    is_inside_button: bool = (SWITCH_BUTTON_X <= x <= SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH) and (
-            SWITCH_BUTTON_Y <= y <= SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT
+    is_inside_button: bool = (
+            (SWITCH_BUTTON_X <= x <= SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH)
+        and (SWITCH_BUTTON_Y <= y <= SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT)
     )
 
     if is_inside_button:
@@ -225,8 +226,8 @@ def draw_switch_mode_button():
     label: str = "ANA" if _mode == 0 else "DIG"
     display.draw_text(
         label,
-        x=SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH // 2,
-        y=SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT // 2,
+        x=SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH//2,
+        y=SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT//2,
         size=2,
         anchor="middle_center",
         color=0xFFFFFF,
