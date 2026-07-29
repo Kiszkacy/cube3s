@@ -18,7 +18,7 @@ _current_module: str | None = None
 def on_module_switch(topic: str, message: str):
     global _current_module
     if message not in MODULES:
-        print(f"[MAIN.ROUTER] received unknown module switch request: '{message}'")
+        print(f"[MAIN.ROUTER] received unknown module switch request: '{message}'.")
         return
     
     if _current_module is not None:
@@ -27,7 +27,7 @@ def on_module_switch(topic: str, message: str):
     _current_module = message
     new_target_module = MODULES[_current_module]
     new_target_module.initialize()
-    print(f"[MAIN.ROUTER] switched to module: '{_current_module}'")
+    print(f"[MAIN.ROUTER] switched to module: '{_current_module}'.")
 
 
 M5.begin()
