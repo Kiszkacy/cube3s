@@ -6,7 +6,7 @@
 ./deploy.sh
 ```
 
-This bmps `BUILD` in `src/version.py`, syncs the version into `pyproject.toml`, copies `src/` onto the device and opens the REPL. Press CTRL+D to restart with the newly uploaded version.
+This bumps `BUILD` in `src/version.py`, syncs the version into `pyproject.toml`, copies `src/` onto the device and opens the REPL. Press CTRL+D to restart with the newly uploaded version.
 
 `MAJOR` (new features) and `MINOR` (fixes) must be bumped by hand in `src/version.py`.
 
