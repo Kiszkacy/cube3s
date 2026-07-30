@@ -1,6 +1,6 @@
 [project]
 name = "cube3s"
-version = "1.0.26"
+version = "1.0.28"
 description = "MicroPython MQTT hobby app for M5Stack CoreS3"
 authors = [
     {name = "Karol Kiszka", email = "karol.kiszka@pm.me"}

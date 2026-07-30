@@ -77,9 +77,9 @@ while True:
     try:
         M5.update()
         wifi.check_connection_reconnect_if_needed()
-        # mqtt.check_connection_reconnect_if_needed()
+        mqtt.check_connection_reconnect_if_needed()
         mqtt.check_if_any_message()
-        # mqtt.ping_if_needed()
+        mqtt.ping_if_needed()
         apply_pending_module_switch()
 
         if _current_module:

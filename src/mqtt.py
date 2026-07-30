@@ -10,6 +10,7 @@ from config import *
 PING_INTERVAL_MS: int = MQTT__KEEPALIVE_SECONDS * 1000 // 2
 RECONNECT_INITIAL_DELAY_MS: int = 1000
 RECONNECT_MAX_DELAY_MS: int = 30000
+CONNECT_TIMEOUT_SECONDS: int = 5 # without it connect() blocks the whole main loop indefinitely
 
 _client: MQTTClient = None
 _is_initialized: bool = False
@@ -24,15 +25,15 @@ _subscribed_topics: dict = {} # topic -> qos | stored in case of a disconnect, s
 
 def client() -> MQTTClient:
     return _client
-    
-    
+
+
 def is_initialized() -> bool:
     return _is_initialized
-    
-    
+
+
 def is_connected() -> bool:
     return _is_connected
-    
+
 
 def handle_incoming_messages(topic: bytes, message: bytes):
     topic_str: str = topic.decode('utf-8')
@@ -56,13 +57,12 @@ def register_handler(topic: str, function):
 def initialize():
     global _client, _is_initialized
     _client = MQTTClient(
-		client_id=MQTT__MY_CLIENT_ID.encode('utf-8'),
-		server=MQTT__BROKER_ADDRESS,
-		port=MQTT__BROKER_PORT,
+        client_id=MQTT__MY_CLIENT_ID.encode('utf-8'),
+        server=MQTT__BROKER_ADDRESS,
+        port=MQTT__BROKER_PORT,
         user=MQTT__MY_USERNAME.encode('utf-8'),
         password=MQTT__MY_PASSWORD.encode('utf-8'),
-        # TODO: this line breaks mqtt connection
-        # keepalive=MQTT__KEEPALIVE_SECONDS
+        keepalive=MQTT__KEEPALIVE_SECONDS
     )
     _client.set_last_will(
         topic=MQTT__MY_LAST_WILL_TOPIC.encode('utf-8'),
@@ -80,6 +80,16 @@ def _schedule_reconnect():
     _reconnect_delay_ms = min(_reconnect_delay_ms * 2, RECONNECT_MAX_DELAY_MS)
 
 
+def _close_socket(): # free a socket, there are only 16? available on the ESP32
+    if _client is None or _client.sock is None:
+        return
+    try:
+        _client.sock.close()
+    except Exception:
+        pass
+    _client.sock = None
+
+
 def _on_connection_lost(error: Exception):
     global _is_connected, _reconnect_delay_ms
     if not _is_connected:
@@ -87,10 +97,7 @@ def _on_connection_lost(error: Exception):
     _is_connected = False
     _reconnect_delay_ms = RECONNECT_INITIAL_DELAY_MS
     print(f"[MQTT] connection lost: '{error}'.")
-    try:
-        _client.sock.close() # free a socket, there are only 16? available on the ESP32
-    except Exception:
-        pass
+    _close_socket()
     _schedule_reconnect()
 
 
@@ -107,9 +114,10 @@ def _restore_subscriptions() -> bool:
 def connect() -> bool:
     global _is_connected, _last_ping_timestamp, _reconnect_delay_ms
     try:
-        _client.connect()
+        _client.connect(timeout=CONNECT_TIMEOUT_SECONDS)
     except Exception as e:
         print(f"[MQTT] failed to connect: '{e}'.")
+        _close_socket()
         _schedule_reconnect()
         return False
 
@@ -147,8 +155,8 @@ def send_bytes(topic: str, payload: bytes, retain: bool = False, qos: int = 0) -
         _on_connection_lost(e)
         return False
     return True
-    
-    
+
+
 def subscribe(topic: str, qos: int = 0) -> bool:
     _subscribed_topics[topic] = qos
     if not _is_connected:
@@ -159,8 +167,8 @@ def subscribe(topic: str, qos: int = 0) -> bool:
         _on_connection_lost(e)
         return False
     return True
-    
-    
+
+
 def unsubscribe(topic: str) -> bool:
     _subscribed_topics.pop(topic, None)
     if not _is_connected:
@@ -171,8 +179,8 @@ def unsubscribe(topic: str) -> bool:
         _on_connection_lost(e)
         return False
     return True
-    
-    
+
+
 def wait_for_any_message__B():
     if not _is_connected:
         return
@@ -180,7 +188,7 @@ def wait_for_any_message__B():
         _client.wait_msg()
     except OSError as e:
         _on_connection_lost(e)
-    
+
 
 def check_if_any_message():
     if not _is_connected:
