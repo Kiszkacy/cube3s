@@ -15,25 +15,34 @@ _vertical_flip: bool = DEFAULT_VERTICAL_FLIP
 
 def enable(pixformat: int = camera.RGB565, framesize: int = camera.QVGA, flip_horizontally: bool = DEFAULT_HORIZONTAL_FLIP, flip_vertically: bool = DEFAULT_VERTICAL_FLIP) -> bool:
     global _is_enabled, _horizontal_flip, _vertical_flip
+    _is_enabled = False
     try:
-        camera.init(pixformat=pixformat, framesize=framesize)
+        if not camera.init(pixformat=pixformat, framesize=framesize):
+            print("[CAMERA] failed to enable: 'camera.init() returned False'.")
+            return False
         camera.set_hmirror(flip_horizontally)
         camera.set_vflip(flip_vertically)
-        _horizontal_flip = flip_horizontally
-        _vertical_flip = flip_vertically
-        _is_enabled = True
-        print("[CAMERA] enabled.")
     except Exception as e:
         print(f"[CAMERA] failed to enable: '{e}'.")
-        _is_enabled = False
-    return _is_enabled
+        return False
+
+    _horizontal_flip = flip_horizontally
+    _vertical_flip = flip_vertically
+    _is_enabled = True
+    print("[CAMERA] enabled.")
+    return True
 
 
 def disable():
     global _is_enabled
-    if _is_enabled:
-        camera.deinit()
+    if not _is_enabled:
+        return
     _is_enabled = False
+    try:
+        camera.deinit()
+    except Exception as e:
+        print(f"[CAMERA] failed to disable cleanly: '{e}'.")
+        return
     print("[CAMERA] disabled.")
 
 
