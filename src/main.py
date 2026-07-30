@@ -7,8 +7,10 @@ M5.begin()
 import time
 
 import mqtt
+import version
 import wifi
 from modules import clock, dashboard, live_camera
+# TODO: cleanup config.py, in there should only be user secret settings like passwords, not module-specific constants
 from config import *
 
 LOOP_INTERVAL_MS: int = 50
@@ -59,6 +61,8 @@ def apply_pending_module_switch():
     _current_module = target
     print(f"[MAIN.ROUTER] switched to module: '{_current_module}'.")
 
+
+print(f"[MAIN] cube3s v{version.VERSION}.")
 
 wifi.connect__B()
 
