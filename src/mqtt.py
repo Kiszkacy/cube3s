@@ -82,7 +82,7 @@ def unsubscribe(topic: str):
     _client.unsubscribe(topic.encode('utf-8'))
     
     
-def wait_for_any_message():
+def wait_for_any_message__B():
     global _client
     _client.wait_msg()
     

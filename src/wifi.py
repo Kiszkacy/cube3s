@@ -5,7 +5,7 @@ import network
 from config import *
 
 
-def connect():
+def connect__B():
     wlan: network.WLAN = network.WLAN(network.STA_IF)
     wlan.active(True)
 

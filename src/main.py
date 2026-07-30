@@ -36,7 +36,7 @@ def on_module_switch(topic: str, message: str):
 
 M5.begin()
 
-wifi.connect()
+wifi.connect__B()
 
 mqtt.initialize()
 mqtt.connect()
