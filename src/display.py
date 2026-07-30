@@ -206,6 +206,7 @@ def draw_rect(x: int, y: int, width: int, height: int, color: int = 0xFFFFFF, fi
         _target.drawRect(x, y, width, height, color)
 
 
+# TODO: rename radius to border_radius/corner_radius ?
 def draw_round_rect(x: int, y: int, width: int, height: int, radius: int, color: int = 0xFFFFFF, fill: bool = False):
     if fill:
         _target.fillRoundRect(x, y, width, height, radius, color)

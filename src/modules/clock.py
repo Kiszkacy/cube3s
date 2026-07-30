@@ -3,16 +3,18 @@ import display
 import power
 import mqtt
 import touch
+import speaker
 import math
 from config import *
 
-import M5 # type: ignore
 
-
-# TODO: implement sound helper module and play sounds on mode switch
-
-DIGITAL_CLOCK_TEXT_SIZE: float = 5.0
+DIGITAL_CLOCK_TEXT_SIZE: float = 8.0
+DIGITAL_CLOCK_SECONDS_TEXT_SIZE: float = 4.0
 DIGITAL_CLOCK_COLOR: int = 0xFFFFFF # white
+DIGITAL_CLOCK_SECONDS_COLOR: int = 0xAAAAAA # light gray
+DIGITAL_CLOCK_TEXT_X: int = display.WIDTH // 2 - 48
+DIGITAL_CLOCK_SECONDS_TEXT_X: int = display.WIDTH // 2 + 48
+DIGITAL_CLOCK_SECONDS_TEXT_Y: int = display.HEIGHT // 2 + 16
 
 ANALOG_CLOCK_CENTER_X: int = display.WIDTH // 2
 ANALOG_CLOCK_CENTER_Y: int = display.HEIGHT // 2
@@ -24,35 +26,44 @@ ANALOG_CLOCK_BORDER_COLOR: int = 0xFFFFFF # white
 ANALOG_CLOCK_HOUR_HAND_COLOR: int = 0xFFFFFF # white
 ANALOG_CLOCK_MINUTE_HAND_COLOR: int = 0xFFFFFF # white
 ANALOG_CLOCK_SECOND_HAND_COLOR: int = 0xFF0000 # red
-ANALOG_CLOCK_HOUR_HAND_WIDTH: int = 4
-ANALOG_CLOCK_MINUTE_HAND_WIDTH: int = 2
-ANALOG_CLOCK_SECOND_HAND_WIDTH: int = 1
 ANALOG_CLOCK_HOUR_TICK_LENGTH: int = 4
-ANALOG_CLOCK_HOUR_TICK_WIDTH: int = 2
 
-BATTERY_ICON_WIDTH: int = 20
-BATTERY_ICON_HEIGHT: int = 40
-BATTERY_ICON_X: int = 10
-BATTERY_ICON_Y: int = 10
+BATTERY_ICON_WIDTH: int = 40
+BATTERY_ICON_HEIGHT: int = 24
+BATTERY_NUB_WIDTH: int = 4
+BATTERY_NUB_HEIGHT: int = 12
+BATTERY_MARGIN: int = 8
+BATTERY_ICON_X: int = display.WIDTH - BATTERY_ICON_WIDTH - BATTERY_NUB_WIDTH - BATTERY_MARGIN
+BATTERY_ICON_Y: int = BATTERY_MARGIN
 BATTERY_BACKGROUND_COLOR: int = 0x555555 # dark gray
 BATTERY_CHARGING_COLOR: int = 0x00FFFF # cyan
 BATTERY_HIGH_COLOR: int = 0x00FF00 # green
 BATTERY_MEDIUM_COLOR: int = 0xFFFF00 # yellow
 BATTERY_LOW_COLOR: int = 0xFF0000 # red
 BATTERY_LEVEL_PADDING: int = 2
-BATTERY_TOP_PADDING: int = 4
-BATTERY_TOP_HEIGHT: int = 4
+BATTERY_TEXT_SIZE: float = 1.0
+BATTERY_TEXT_COLOR: int = 0xFFFFFF # white
 
-SWITCH_BUTTON_WIDTH: int = 60
-SWITCH_BUTTON_HEIGHT: int = 40
-SWITCH_BUTTON_X: int = display.WIDTH - SWITCH_BUTTON_WIDTH - 10
-SWITCH_BUTTON_Y: int = display.HEIGHT - SWITCH_BUTTON_HEIGHT - 10
+SWITCH_BUTTON_WIDTH: int = 40
+SWITCH_BUTTON_HEIGHT: int = 32
+SWITCH_BUTTON_MARGIN: int = 8
+SWITCH_BUTTON_X: int = display.WIDTH - SWITCH_BUTTON_WIDTH - SWITCH_BUTTON_MARGIN
+SWITCH_BUTTON_Y: int = display.HEIGHT - SWITCH_BUTTON_HEIGHT - SWITCH_BUTTON_MARGIN
 SWITCH_BUTTON_FILL_COLOR: int = 0x004040 # dark cyan
 SWITCH_BUTTON_BORDER_COLOR: int = 0xFFFFFF # white
+SWITCH_BUTTON_TEXT_SIZE: float = 1.0
+SWITCH_BUTTON_TEXT_COLOR: int = 0xFFFFFF # white
+
+TOUCH_INACTIVITY_TIMEOUT_MS: int = 10000
 
 _mode: int = 0  # 0 => digital, 1 => analog
 _previous_mode: int = -1
 _previous_second: int = -1
+_previous_awake: bool = True
+
+_awake: bool = True # whether the ui reacts to touch and shows the switch button
+_last_interaction_ms: int = time.ticks_ms()
+_ignore_touch_until_release: bool = False # true while consuming the wake touch
 
 
 def on_mqtt_mode_switch(topic: str, message: str):
@@ -100,8 +111,22 @@ def deinitialize():
 
 
 def handle_touch():
-    global _mode
+    global _mode, _awake, _last_interaction_ms, _ignore_touch_until_release
+
     if not touch.is_pressed():
+        _ignore_touch_until_release = False
+        return
+
+    if not _awake: # first touch after inactivity => wake up the ui, do not do anything else yet
+        _awake = True
+        _ignore_touch_until_release = True
+        _last_interaction_ms = time.ticks_ms()
+        return
+
+    # update last known touch interaction time
+    _last_interaction_ms = time.ticks_ms()
+
+    if _ignore_touch_until_release:
         return
 
     x, y = touch.position()
@@ -114,6 +139,7 @@ def handle_touch():
         # inside switch button => switch mode
         if touch.was_pressed():
             _mode = 1 - _mode
+            speaker.beep()
     else :
         # outside switch button => adjust brightness
         brightness: int = int(255 * (1.0 - (y / display.HEIGHT)))
@@ -125,13 +151,22 @@ def draw_digital_clock():
     now: time.struct_time = time.localtime(time.time() + UTC_OFFSET*3600)
     hours, minutes, seconds = now[3], now[4], now[5]
 
-    display.draw_text(
-        f"{hours:02}:{minutes:02}:{seconds:02}",
-        x=display.WIDTH//2,
+    display.draw_text( # big HH:MM taking most of the space
+        f"{hours:02}:{minutes:02}",
+        x=DIGITAL_CLOCK_TEXT_X,
         y=display.HEIGHT//2,
         size=DIGITAL_CLOCK_TEXT_SIZE,
-        anchor="middle_center",
+        anchor="middle-center",
         color=DIGITAL_CLOCK_COLOR
+    )
+
+    display.draw_text( # smaller seconds on the right
+        f"{seconds:02}",
+        x=DIGITAL_CLOCK_SECONDS_TEXT_X,
+        y=DIGITAL_CLOCK_SECONDS_TEXT_Y,
+        size=DIGITAL_CLOCK_SECONDS_TEXT_SIZE,
+        anchor="middle-center",
+        color=DIGITAL_CLOCK_SECONDS_COLOR
     )
 
 
@@ -148,7 +183,7 @@ def draw_analog_clock():
         y_outer: int = int(ANALOG_CLOCK_CENTER_Y - ANALOG_CLOCK_RADIUS * math.cos(angle))
         x_inner: int = int(ANALOG_CLOCK_CENTER_X + (ANALOG_CLOCK_RADIUS - ANALOG_CLOCK_HOUR_TICK_LENGTH) * math.sin(angle))
         y_inner: int = int(ANALOG_CLOCK_CENTER_Y - (ANALOG_CLOCK_RADIUS - ANALOG_CLOCK_HOUR_TICK_LENGTH) * math.cos(angle))
-        display.draw_line(x_inner, y_inner, x_outer, y_outer, color=ANALOG_CLOCK_BORDER_COLOR, width=ANALOG_CLOCK_HOUR_TICK_WIDTH)
+        display.draw_line(x_inner, y_inner, x_outer, y_outer, color=ANALOG_CLOCK_BORDER_COLOR)
 
     hour_angle: float = math.radians(((hours % 12) + minutes / 60.0) * 30)
     minute_angle: float = math.radians((minutes + seconds / 60.0) * 6)
@@ -156,15 +191,15 @@ def draw_analog_clock():
 
     hour_x: int = int(ANALOG_CLOCK_CENTER_X + (ANALOG_CLOCK_HOUR_HAND_LENGTH) * math.sin(hour_angle))
     hour_y: int = int(ANALOG_CLOCK_CENTER_Y - (ANALOG_CLOCK_HOUR_HAND_LENGTH) * math.cos(hour_angle))
-    display.draw_line(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, hour_x, hour_y, color=ANALOG_CLOCK_HOUR_HAND_COLOR, width=ANALOG_CLOCK_HOUR_HAND_WIDTH)
+    display.draw_line(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, hour_x, hour_y, color=ANALOG_CLOCK_HOUR_HAND_COLOR)
 
     minute_x: int = int(ANALOG_CLOCK_CENTER_X + (ANALOG_CLOCK_MINUTE_HAND_LENGTH) * math.sin(minute_angle))
     minute_y: int = int(ANALOG_CLOCK_CENTER_Y - (ANALOG_CLOCK_MINUTE_HAND_LENGTH) * math.cos(minute_angle))
-    display.draw_line(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, minute_x, minute_y, color=ANALOG_CLOCK_MINUTE_HAND_COLOR, width=ANALOG_CLOCK_MINUTE_HAND_WIDTH)
+    display.draw_line(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, minute_x, minute_y, color=ANALOG_CLOCK_MINUTE_HAND_COLOR)
 
     second_x: int = int(ANALOG_CLOCK_CENTER_X + (ANALOG_CLOCK_SECOND_HAND_LENGTH) * math.sin(second_angle))
     second_y: int = int(ANALOG_CLOCK_CENTER_Y - (ANALOG_CLOCK_SECOND_HAND_LENGTH) * math.cos(second_angle))
-    display.draw_line(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, second_x, second_y, color=ANALOG_CLOCK_SECOND_HAND_COLOR, width=ANALOG_CLOCK_SECOND_HAND_WIDTH)
+    display.draw_line(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, second_x, second_y, color=ANALOG_CLOCK_SECOND_HAND_COLOR)
 
 
 def draw_battery():
@@ -182,44 +217,53 @@ def draw_battery():
     else:
         battery_color = BATTERY_LOW_COLOR
 
-    display.draw_rect( # battery background
+    display.draw_round_rect( # battery body
         x=BATTERY_ICON_X,
         y=BATTERY_ICON_Y,
         width=BATTERY_ICON_WIDTH,
         height=BATTERY_ICON_HEIGHT,
+        radius=2,
         color=BATTERY_BACKGROUND_COLOR,
         fill=True
     )
-    display.draw_rect( # battery top
-        x=BATTERY_ICON_X+BATTERY_TOP_PADDING,
-        y=BATTERY_ICON_Y-BATTERY_TOP_HEIGHT,
-        width=BATTERY_ICON_WIDTH-2*BATTERY_TOP_PADDING,
-        height=BATTERY_TOP_HEIGHT,
+    display.draw_rect( # battery nub on the right side
+        x=BATTERY_ICON_X+BATTERY_ICON_WIDTH,
+        y=BATTERY_ICON_Y+(BATTERY_ICON_HEIGHT-BATTERY_NUB_HEIGHT)//2,
+        width=BATTERY_NUB_WIDTH,
+        height=BATTERY_NUB_HEIGHT,
         color=BATTERY_BACKGROUND_COLOR,
         fill=True
     )
-    battery_level_max_height: int = int((BATTERY_ICON_HEIGHT-2*BATTERY_LEVEL_PADDING))
-    display.draw_round_rect( # actual battery level
-        x=BATTERY_ICON_X+BATTERY_LEVEL_PADDING, 
-        y=int(BATTERY_ICON_Y+BATTERY_LEVEL_PADDING+(battery_level_max_height*(100-battery_level)/100)),
-        width=(BATTERY_ICON_WIDTH-2*BATTERY_LEVEL_PADDING),
-        height=int(battery_level_max_height*(battery_level/100)),
-        radius=4,
+    battery_level_max_width: int = BATTERY_ICON_WIDTH-2*BATTERY_LEVEL_PADDING
+    display.draw_round_rect( # actual battery level, fills left -> right
+        x=BATTERY_ICON_X+BATTERY_LEVEL_PADDING,
+        y=BATTERY_ICON_Y+BATTERY_LEVEL_PADDING,
+        width=max(1, int(battery_level_max_width*(battery_level/100))),
+        height=BATTERY_ICON_HEIGHT-2*BATTERY_LEVEL_PADDING,
+        radius=2,
         color=battery_color,
         fill=True
+    )
+    display.draw_text( # percentage text inside the battery
+        f"{battery_level}%",
+        x=BATTERY_ICON_X+BATTERY_ICON_WIDTH//2,
+        y=BATTERY_ICON_Y+BATTERY_ICON_HEIGHT//2,
+        size=BATTERY_TEXT_SIZE,
+        anchor="middle-center",
+        color=BATTERY_TEXT_COLOR
     )
 
 
 def draw_switch_mode_button():
     display.draw_round_rect(
         SWITCH_BUTTON_X, SWITCH_BUTTON_Y, SWITCH_BUTTON_WIDTH, SWITCH_BUTTON_HEIGHT,
-        radius=8,
+        radius=4,
         color=SWITCH_BUTTON_FILL_COLOR,
         fill=True
     )
     display.draw_round_rect(
         SWITCH_BUTTON_X, SWITCH_BUTTON_Y, SWITCH_BUTTON_WIDTH, SWITCH_BUTTON_HEIGHT,
-        radius=8,
+        radius=4,
         color=SWITCH_BUTTON_BORDER_COLOR
     )
 
@@ -228,25 +272,30 @@ def draw_switch_mode_button():
         label,
         x=SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH//2,
         y=SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT//2,
-        size=2,
-        anchor="middle_center",
-        color=0xFFFFFF,
+        size=SWITCH_BUTTON_TEXT_SIZE,
+        anchor="middle-center",
+        color=SWITCH_BUTTON_TEXT_COLOR,
         background_color=SWITCH_BUTTON_FILL_COLOR
     )
 
 
 def update():
-    global _previous_mode, _previous_second
+    global _previous_mode, _previous_second, _previous_awake, _awake
 
     handle_touch() # handle touch at every update loop
 
+    # hide the switch button and sleep touch after was not touched for a while
+    if _awake and time.ticks_diff(time.ticks_ms(), _last_interaction_ms) > TOUCH_INACTIVITY_TIMEOUT_MS:
+        _awake = False
+
     current_second: int = time.localtime()[5]
 
-    if _previous_mode != _mode or _previous_second != current_second:
+    if _previous_mode != _mode or _previous_second != current_second or _previous_awake != _awake:
         _previous_mode = _mode
         _previous_second = current_second
+        _previous_awake = _awake
 
-        # redraw only if mode changed or second changed to avoid unnecessary redraws
+        # redraw only if mode changed, second changed or button visibility changed
         display.clear_canvas()
 
         if _mode == 0:
@@ -254,6 +303,7 @@ def update():
         elif _mode == 1:
             draw_analog_clock()
         draw_battery()
-        draw_switch_mode_button()
+        if _awake:
+            draw_switch_mode_button()
 
         display.flush_canvas()

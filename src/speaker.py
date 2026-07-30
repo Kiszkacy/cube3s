@@ -4,7 +4,7 @@ import M5 # type: ignore
 
 DEFAULT_VOLUME: int = 128 # 0 - 255
 DEFAULT_SAMPLE_RATE: int = 16000 # hz
-BEEP_TONE: int = 1000 # hz
+BEEP_TONE: int = 1000 # hz ~100 - 10000
 BEEP_DURATION: int = 80 # ms
 
 
