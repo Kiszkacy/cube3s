@@ -8,7 +8,7 @@ from config import *
 
 def on_input_update(topic: str, message: str):
     display.clear_screen()
-    display.show_text(message)
+    display.draw_text(message)
 
 
 def initialize():

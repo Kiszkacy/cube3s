@@ -10,7 +10,7 @@ _mic = M5.Mic
 
 
 def enable():
-    if _mic.isEnabled():
+    if _mic.isRunning():
         return
     _mic.begin()
     print("[MIC] enabled.")
@@ -22,7 +22,7 @@ def disable():
 
 
 def is_enabled() -> bool:
-    return _mic.isEnabled()
+    return _mic.isRunning()
 
 
 def is_recording() -> bool:

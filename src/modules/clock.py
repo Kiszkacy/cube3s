@@ -89,14 +89,22 @@ def on_mqtt_brightness(topic: str, message: str):
 
 
 def initialize():
+    global _previous_mode, _previous_second, _previous_awake, _awake, _last_interaction_ms, _ignore_touch_until_release
     display.use_canvas()
+
+    _previous_mode = -1
+    _previous_second = -1
+    _previous_awake = True
+    _awake = True
+    _last_interaction_ms = time.ticks_ms()
+    _ignore_touch_until_release = False
 
     mqtt.register_handler(CLOCK__MQTT_MODE_SWITCH_TOPIC, on_mqtt_mode_switch)
     mqtt.subscribe(CLOCK__MQTT_MODE_SWITCH_TOPIC)
     mqtt.register_handler(CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC, on_mqtt_brightness)
     mqtt.subscribe(CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC)
 
-    speaker.set_volume(speaker.DEFAULT_VOLUME) # TODO: temporary
+    speaker.enable()
     
     print("[CLOCK] initialized.")
 

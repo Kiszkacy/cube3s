@@ -1,5 +1,4 @@
 import M5 # type: ignore
-# IMPORTANT: speaker is enabled by default after M5.begin()
 # IMPORTANT: only speaker or mic can be enabled at a time, because they share the same bus, there are no safety checks in either module
 
 DEFAULT_VOLUME: int = 64 # 0 - 255
@@ -13,7 +12,7 @@ _speaker = M5.Speaker
 
 
 def enable(volume: int = DEFAULT_VOLUME):
-    if not _speaker.isEnabled():
+    if not _speaker.isRunning():
         _speaker.begin()
     _speaker.setVolume(volume)
     print("[SPEAKER] enabled.")
@@ -25,7 +24,7 @@ def disable():
 
 
 def is_enabled() -> bool:
-    return _speaker.isEnabled()
+    return _speaker.isRunning()
 
 
 def set_volume(volume: int): # 0 - 255

@@ -33,8 +33,13 @@ HORIZONTAL_ANCHORS: tuple = ("left", "center", "right")
 
 
 def initialize_canvas(width: int = WIDTH, height: int = HEIGHT):
-    global _canvas
+    global _canvas, _target
+    was_active: bool = _target is _canvas
+    if _canvas is not None:
+        _canvas.delete() # remove old canvas to avoid memory leak
     _canvas = _display.newCanvas(width, height, 16, True)
+    if was_active:
+        _target = _canvas
 
 
 def use_canvas():
@@ -50,7 +55,8 @@ def use_display():
 
 
 def flush_canvas(x: int = 0, y: int = 0):
-    _canvas.push(x, y)
+    if _canvas is not None:
+        _canvas.push(x, y)
 
 
 def clear_canvas(color: int = -1):

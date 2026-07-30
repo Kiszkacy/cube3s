@@ -28,10 +28,6 @@ def vbus_voltage() -> int: # millivolts
     return _power.getVBUSVoltage()
 
 
-def vbus_current() -> float: # milliamps
-    return _power.getVBUSCurrent()
-
-
 def is_usb_connected() -> bool:
     return _power.getVBUSVoltage() > USB_CONNECTED_THRESHOLD
 
