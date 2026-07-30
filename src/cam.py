@@ -1,9 +1,11 @@
 import camera
+import jpg
 # IMPORTANT: named "cam" instead of "camera" so it does not shadow the builtin driver module
 
 
 DEFAULT_HORIZONTAL_FLIP: bool = True
 DEFAULT_VERTICAL_FLIP: bool = False
+DEFAULT_JPEG_QUALITY: int = 80 # 0 - 100
 
 
 _is_enabled: bool = False # no isEnabled() method in the camera driver
@@ -75,3 +77,7 @@ def reset_vertical_flip():
 
 def snapshot() -> object:
     return camera.snapshot()
+
+
+def encode_jpeg(img: object, quality: int = DEFAULT_JPEG_QUALITY) -> object: # returns a jpg object exposing .bytearray() and .size()
+    return jpg.encode(img, quality)
