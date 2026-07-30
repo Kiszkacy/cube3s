@@ -35,4 +35,4 @@ def update():
 
     img: object = cam.snapshot()
     if img is not None:
-        display.draw_image(img, width=320, height=240)
+        display.draw_image(img, width=display.WIDTH, height=display.HEIGHT)
