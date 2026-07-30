@@ -7,6 +7,8 @@ _printed_error_message: bool = False
 
 
 def initialize():
+    global _printed_error_message
+    _printed_error_message = False
     cam.enable()
 
 
