@@ -95,6 +95,8 @@ def initialize():
     mqtt.subscribe(CLOCK__MQTT_MODE_SWITCH_TOPIC)
     mqtt.register_handler(CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC, on_mqtt_brightness)
     mqtt.subscribe(CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC)
+
+    speaker.set_volume(speaker.DEFAULT_VOLUME) # TODO: temporary
     
     print("[CLOCK] initialized.")
 

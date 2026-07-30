@@ -2,9 +2,10 @@ import M5 # type: ignore
 # IMPORTANT: speaker is enabled by default after M5.begin()
 # IMPORTANT: only speaker or mic can be enabled at a time, because they share the same bus, there are no safety checks in either module
 
-DEFAULT_VOLUME: int = 128 # 0 - 255
+DEFAULT_VOLUME: int = 64 # 0 - 255
 DEFAULT_SAMPLE_RATE: int = 16000 # hz
 BEEP_TONE: int = 1000 # hz ~100 - 10000
+BEEP_TONE_HIGH: int = 1400 # hz, second note of the double beep
 BEEP_DURATION: int = 80 # ms
 
 
@@ -35,11 +36,12 @@ def get_volume() -> int: # 0 - 255
     return _speaker.getVolume()
 
 
-def tone(frequency: int, duration_ms: int, volume: int = -1): # frequency ~100 - 10000 hz
+# TODO: what does channel do exactly ?
+def tone(frequency: int, duration_ms: int, volume: int = -1, channel: int = 0, stop_current_sound: bool = True): # frequency ~100 - 10000 hz
     if volume != -1:
         clamped_volume: int = max(0, min(255, volume))
         _speaker.setVolume(clamped_volume)
-    _speaker.tone(frequency, duration_ms)
+    _speaker.tone(frequency, duration_ms, channel, stop_current_sound)
 
 
 def stop():
@@ -56,3 +58,8 @@ def is_playing() -> bool:
 
 def beep(volume: int = -1):
     tone(BEEP_TONE, BEEP_DURATION, volume)
+
+
+def double_beep(volume: int = -1):
+    tone(BEEP_TONE, BEEP_DURATION, volume, stop_current_sound=True)
+    tone(BEEP_TONE_HIGH, BEEP_DURATION, stop_current_sound=False) # queue second beep
