@@ -8,13 +8,14 @@ import math
 from config import *
 
 
-DIGITAL_CLOCK_TEXT_SIZE: float = 8.0
+DIGITAL_CLOCK_TEXT_SIZE: float = 10.0
 DIGITAL_CLOCK_SECONDS_TEXT_SIZE: float = 4.0
 DIGITAL_CLOCK_COLOR: int = 0xFFFFFF # white
 DIGITAL_CLOCK_SECONDS_COLOR: int = 0xAAAAAA # light gray
 DIGITAL_CLOCK_TEXT_X: int = display.WIDTH // 2 - 16
-DIGITAL_CLOCK_SECONDS_TEXT_X: int = display.WIDTH // 2 + 128
-DIGITAL_CLOCK_SECONDS_TEXT_Y: int = display.HEIGHT // 2 + 16 - 3
+DIGITAL_CLOCK_SECONDS_TEXT_X: int = display.WIDTH // 2 + 136
+DIGITAL_CLOCK_SECONDS_TEXT_Y: int = display.HEIGHT // 2 + 16 + 2
+DIGITAL_CLOCK_COLON_GAP: int = 10
 
 ANALOG_CLOCK_CENTER_X: int = display.WIDTH // 2
 ANALOG_CLOCK_CENTER_Y: int = display.HEIGHT // 2
@@ -159,14 +160,13 @@ def draw_digital_clock():
     now: time.struct_time = time.localtime(time.time() + UTC_OFFSET*3600)
     hours, minutes, seconds = now[3], now[4], now[5]
 
-    display.draw_text( # big HH:MM taking most of the space
-        f"{hours:02}:{minutes:02}",
-        x=DIGITAL_CLOCK_TEXT_X,
-        y=display.HEIGHT//2,
-        size=DIGITAL_CLOCK_TEXT_SIZE,
-        anchor="middle-center",
-        color=DIGITAL_CLOCK_COLOR
-    )
+    y: int = display.HEIGHT // 2
+    display.set_text_color(DIGITAL_CLOCK_COLOR)
+    display.set_text_size(DIGITAL_CLOCK_TEXT_SIZE)
+    display.draw_text(":", x=DIGITAL_CLOCK_TEXT_X, y=y, anchor="middle-center")
+    display.draw_text(f"{hours:02}", x=DIGITAL_CLOCK_TEXT_X - DIGITAL_CLOCK_COLON_GAP, y=y, anchor="middle-right")
+    display.draw_text(f"{minutes:02}", x=DIGITAL_CLOCK_TEXT_X + DIGITAL_CLOCK_COLON_GAP, y=y, anchor="middle-left")
+
 
     display.draw_text( # smaller seconds on the right
         f"{seconds:02}",
@@ -176,6 +176,7 @@ def draw_digital_clock():
         anchor="middle-center",
         color=DIGITAL_CLOCK_SECONDS_COLOR
     )
+
 
 
 def draw_analog_clock():
