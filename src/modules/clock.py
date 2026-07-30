@@ -1,5 +1,6 @@
 import time
 import display
+import power
 import mqtt
 import touch
 import math
@@ -167,10 +168,9 @@ def draw_analog_clock():
 
 
 def draw_battery():
-    # TODO: implement proper power helper module
-    battery_level: int = M5.Power.getBatteryLevel()
-    is_battery_charging: bool = M5.Power.isCharging()
-    is_usb_connected: bool = M5.Power.getVBUSVoltage() > 4000
+    battery_level: int = power.battery_level()
+    is_battery_charging: bool = power.is_charging()
+    is_usb_connected: bool = power.is_usb_connected()
 
     battery_color: int = BATTERY_BACKGROUND_COLOR
     if is_battery_charging or is_usb_connected:
