@@ -63,10 +63,18 @@ def connect():
 
 
 def send_message(topic: str, msg: str, retain: bool = False, qos: int = 0):
-    global _client
     _client.publish(
         topic=topic.encode('utf-8'),
         msg=msg.encode('utf-8'),
+        retain=retain,
+        qos=qos
+    )
+
+
+def send_bytes(topic: str, payload: bytes, retain: bool = False, qos: int = 0):
+    _client.publish(
+        topic=topic.encode('utf-8'),
+        msg=payload,
         retain=retain,
         qos=qos
     )
