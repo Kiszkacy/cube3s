@@ -12,9 +12,9 @@ DIGITAL_CLOCK_TEXT_SIZE: float = 8.0
 DIGITAL_CLOCK_SECONDS_TEXT_SIZE: float = 4.0
 DIGITAL_CLOCK_COLOR: int = 0xFFFFFF # white
 DIGITAL_CLOCK_SECONDS_COLOR: int = 0xAAAAAA # light gray
-DIGITAL_CLOCK_TEXT_X: int = display.WIDTH // 2 - 48
-DIGITAL_CLOCK_SECONDS_TEXT_X: int = display.WIDTH // 2 + 48
-DIGITAL_CLOCK_SECONDS_TEXT_Y: int = display.HEIGHT // 2 + 16
+DIGITAL_CLOCK_TEXT_X: int = display.WIDTH // 2 - 16
+DIGITAL_CLOCK_SECONDS_TEXT_X: int = display.WIDTH // 2 + 128
+DIGITAL_CLOCK_SECONDS_TEXT_Y: int = display.HEIGHT // 2 + 16 - 3
 
 ANALOG_CLOCK_CENTER_X: int = display.WIDTH // 2
 ANALOG_CLOCK_CENTER_Y: int = display.HEIGHT // 2
@@ -28,8 +28,8 @@ ANALOG_CLOCK_MINUTE_HAND_COLOR: int = 0xFFFFFF # white
 ANALOG_CLOCK_SECOND_HAND_COLOR: int = 0xFF0000 # red
 ANALOG_CLOCK_HOUR_TICK_LENGTH: int = 4
 
-BATTERY_ICON_WIDTH: int = 40
-BATTERY_ICON_HEIGHT: int = 24
+BATTERY_ICON_WIDTH: int = 48
+BATTERY_ICON_HEIGHT: int = 28
 BATTERY_NUB_WIDTH: int = 4
 BATTERY_NUB_HEIGHT: int = 12
 BATTERY_MARGIN: int = 8
@@ -40,18 +40,16 @@ BATTERY_CHARGING_COLOR: int = 0x00FFFF # cyan
 BATTERY_HIGH_COLOR: int = 0x00FF00 # green
 BATTERY_MEDIUM_COLOR: int = 0xFFFF00 # yellow
 BATTERY_LOW_COLOR: int = 0xFF0000 # red
-BATTERY_LEVEL_PADDING: int = 2
-BATTERY_TEXT_SIZE: float = 1.0
-BATTERY_TEXT_COLOR: int = 0xFFFFFF # white
+BATTERY_LEVEL_PADDING: int = 4
 
-SWITCH_BUTTON_WIDTH: int = 40
-SWITCH_BUTTON_HEIGHT: int = 32
+SWITCH_BUTTON_WIDTH: int = 44
+SWITCH_BUTTON_HEIGHT: int = 36
 SWITCH_BUTTON_MARGIN: int = 8
 SWITCH_BUTTON_X: int = display.WIDTH - SWITCH_BUTTON_WIDTH - SWITCH_BUTTON_MARGIN
 SWITCH_BUTTON_Y: int = display.HEIGHT - SWITCH_BUTTON_HEIGHT - SWITCH_BUTTON_MARGIN
 SWITCH_BUTTON_FILL_COLOR: int = 0x004040 # dark cyan
 SWITCH_BUTTON_BORDER_COLOR: int = 0xFFFFFF # white
-SWITCH_BUTTON_TEXT_SIZE: float = 1.0
+SWITCH_BUTTON_TEXT_SIZE: float = 2.0
 SWITCH_BUTTON_TEXT_COLOR: int = 0xFFFFFF # white
 
 TOUCH_INACTIVITY_TIMEOUT_MS: int = 10000
@@ -254,14 +252,6 @@ def draw_battery():
         color=battery_color,
         fill=True
     )
-    display.draw_text( # percentage text inside the battery
-        f"{battery_level}%",
-        x=BATTERY_ICON_X+BATTERY_ICON_WIDTH//2,
-        y=BATTERY_ICON_Y+BATTERY_ICON_HEIGHT//2,
-        size=BATTERY_TEXT_SIZE,
-        anchor="middle-center",
-        color=BATTERY_TEXT_COLOR
-    )
 
 
 def draw_switch_mode_button():
@@ -312,8 +302,9 @@ def update():
             draw_digital_clock()
         elif _mode == 1:
             draw_analog_clock()
-        draw_battery()
+
         if _awake:
+            draw_battery()
             draw_switch_mode_button()
 
         display.flush_canvas()

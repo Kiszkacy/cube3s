@@ -61,7 +61,8 @@ def initialize():
 		port=MQTT__BROKER_PORT,
         user=MQTT__MY_USERNAME.encode('utf-8'),
         password=MQTT__MY_PASSWORD.encode('utf-8'),
-        keepalive=MQTT__KEEPALIVE_SECONDS
+        # TODO: this line breaks mqtt connection
+        # keepalive=MQTT__KEEPALIVE_SECONDS
     )
     _client.set_last_will(
         topic=MQTT__MY_LAST_WILL_TOPIC.encode('utf-8'),

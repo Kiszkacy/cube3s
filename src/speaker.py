@@ -1,7 +1,7 @@
 import M5 # type: ignore
 # IMPORTANT: only speaker or mic can be enabled at a time, because they share the same bus, there are no safety checks in either module
 
-DEFAULT_VOLUME: int = 64 # 0 - 255
+DEFAULT_VOLUME: int = 32 # 0 - 255
 DEFAULT_SAMPLE_RATE: int = 16000 # hz
 BEEP_TONE: int = 1000 # hz ~100 - 10000
 BEEP_TONE_HIGH: int = 1400 # hz, second note of the double beep
