@@ -1,11 +1,18 @@
-import time
+import M5 # type: ignore
 
-import M5  # type: ignore
+# IMPORTANT: has to run before every other import
+# so any global variables in the other modules that use M5 are initialized correctly
+M5.begin()
+
+import time
 
 import mqtt
 import wifi
 from modules import clock, dashboard, live_camera
 from config import *
+
+LOOP_INTERVAL_MS: int = 50
+LOOP_ERROR_DELAY_MS: int = 800
 
 # module switching logic
 MODULES: dict = {
@@ -17,24 +24,41 @@ MODULES: dict = {
 # TODO: implement helper time module and daily reset logic
 
 _current_module: str | None = None
+_pending_module: str | None = None
 
 
 def on_module_switch(topic: str, message: str):
-    global _current_module
+    # IMPORTANT: -- according to LLM --
+    # this runs inside mqtt.check_if_any_message(), so it must not touch the socket itself.
+    # initialize()/deinitialize() call subscribe()/unsubscribe(), which would re-enter the blocking
+    # receive loop and can either hang the main loop or trip its packet id assert
+    global _pending_module
     if message not in MODULES:
         print(f"[MAIN.ROUTER] received unknown module switch request: '{message}'.")
         return
-    
+
+    _pending_module = message
+
+
+def apply_pending_module_switch():
+    global _current_module, _pending_module
+    if _pending_module is None:
+        return
+
+    target: str = _pending_module
+    _pending_module = None
+
+    if target == _current_module:
+        return
+
     if _current_module is not None:
         MODULES[_current_module].deinitialize()
-    
-    _current_module = message
-    new_target_module = MODULES[_current_module]
-    new_target_module.initialize()
+        _current_module = None # until new module is initialized
+
+    MODULES[target].initialize()
+    _current_module = target
     print(f"[MAIN.ROUTER] switched to module: '{_current_module}'.")
 
-
-M5.begin()
 
 wifi.connect__B()
 
@@ -43,13 +67,21 @@ mqtt.connect()
 mqtt.register_handler(MQTT__MODULE_SWITCH_TOPIC, on_module_switch)
 mqtt.subscribe(MQTT__MODULE_SWITCH_TOPIC)
 
-print(f"[MAIN] starting main loop.")
+print("[MAIN] starting main loop.")
 # TODO: measure frame time and loop execution time
 while True:
-    M5.update()
-    mqtt.check_if_any_message()
+    try:
+        M5.update()
+        wifi.check_connection_reconnect_if_needed()
+        mqtt.check_connection_reconnect_if_needed()
+        mqtt.check_if_any_message()
+        mqtt.ping_if_needed()
+        apply_pending_module_switch()
 
-    if _current_module:
-        MODULES[_current_module].update()
+        if _current_module:
+            MODULES[_current_module].update()
+    except Exception as e:
+        print(f"[MAIN] unhandled error in main loop: '{e}'.")
+        time.sleep_ms(LOOP_ERROR_DELAY_MS)
 
-    time.sleep_ms(50)
+    time.sleep_ms(LOOP_INTERVAL_MS)

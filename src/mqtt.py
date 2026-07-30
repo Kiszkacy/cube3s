@@ -1,12 +1,25 @@
+import time
+
 from umqtt.simple import MQTTClient
 
 from config import *
 
+# TODO: LLM added a lot of try/except blocks
+# TODO: the code seems a bit convoluted, maybe I should go over it and simplify it sometime
+
+PING_INTERVAL_MS: int = MQTT__KEEPALIVE_SECONDS * 1000 // 2
+RECONNECT_INITIAL_DELAY_MS: int = 1000
+RECONNECT_MAX_DELAY_MS: int = 30000
+
 _client: MQTTClient = None
 _is_initialized: bool = False
 _is_connected: bool = False
+_last_ping_timestamp: int = 0
+_next_reconnect_timestamp: int = 0
+_reconnect_delay_ms: int = RECONNECT_INITIAL_DELAY_MS
 
 _message_handlers: dict = {}
+_subscribed_topics: dict = {} # topic -> qos | stored in case of a disconnect, so they can be restored
 
 
 def client() -> MQTTClient:
@@ -27,7 +40,10 @@ def handle_incoming_messages(topic: bytes, message: bytes):
 
     if topic in _message_handlers:
         print(f"[MQTT] received: '{topic_str}' -> '{msg_str[:50]}', sending to a corresponding handler.")
-        _message_handlers[topic](topic_str, msg_str)
+        try:
+            _message_handlers[topic](topic_str, msg_str)
+        except Exception as e:
+            print(f"[MQTT] handler for '{topic_str}' failed: '{e}'.")
     else:
         print(f"[MQTT] received unhandled topic: '{topic_str}' -> '{msg_str[:50]}'.")
 
@@ -44,7 +60,8 @@ def initialize():
 		server=MQTT__BROKER_ADDRESS,
 		port=MQTT__BROKER_PORT,
         user=MQTT__MY_USERNAME.encode('utf-8'),
-        password=MQTT__MY_PASSWORD.encode('utf-8')
+        password=MQTT__MY_PASSWORD.encode('utf-8'),
+        keepalive=MQTT__KEEPALIVE_SECONDS
     )
     _client.set_last_will(
         topic=MQTT__MY_LAST_WILL_TOPIC.encode('utf-8'),
@@ -54,47 +71,133 @@ def initialize():
     )
     _client.set_callback(handle_incoming_messages)
     _is_initialized = True
-    
 
-def connect():
-    global _client, _is_connected
-    _client.connect()
+
+def _schedule_reconnect():
+    global _next_reconnect_timestamp, _reconnect_delay_ms
+    _next_reconnect_timestamp = time.ticks_add(time.ticks_ms(), _reconnect_delay_ms)
+    _reconnect_delay_ms = min(_reconnect_delay_ms * 2, RECONNECT_MAX_DELAY_MS)
+
+
+def _on_connection_lost(error: Exception):
+    global _is_connected, _reconnect_delay_ms
+    if not _is_connected:
+        return
+    _is_connected = False
+    _reconnect_delay_ms = RECONNECT_INITIAL_DELAY_MS
+    print(f"[MQTT] connection lost: '{error}'.")
+    try:
+        _client.sock.close() # free a socket, there are only 16? available on the ESP32
+    except Exception:
+        pass
+    _schedule_reconnect()
+
+
+def _restore_subscriptions() -> bool:
+    for topic, qos in _subscribed_topics.items():
+        try:
+            _client.subscribe(topic.encode('utf-8'), qos)
+        except OSError as e:
+            _on_connection_lost(e)
+            return False
+    return True
+
+
+def connect() -> bool:
+    global _is_connected, _last_ping_timestamp, _reconnect_delay_ms
+    try:
+        _client.connect()
+    except Exception as e:
+        print(f"[MQTT] failed to connect: '{e}'.")
+        _schedule_reconnect()
+        return False
+
     _is_connected = True
+    _last_ping_timestamp = time.ticks_ms()
+    _reconnect_delay_ms = RECONNECT_INITIAL_DELAY_MS
+    print("[MQTT] connected.")
+    return _restore_subscriptions()
 
 
-def send_message(topic: str, msg: str, retain: bool = False, qos: int = 0):
-    _client.publish(
-        topic=topic.encode('utf-8'),
-        msg=msg.encode('utf-8'),
-        retain=retain,
-        qos=qos
-    )
+def check_connection_reconnect_if_needed():
+    if _is_connected or not _is_initialized:
+        return
+    if time.ticks_diff(time.ticks_ms(), _next_reconnect_timestamp) < 0:
+        return
+    print("[MQTT] reconnecting...")
+    connect()
 
 
-def send_bytes(topic: str, payload: bytes, retain: bool = False, qos: int = 0):
-    _client.publish(
-        topic=topic.encode('utf-8'),
-        msg=payload,
-        retain=retain,
-        qos=qos
-    )
+def send_message(topic: str, msg: str, retain: bool = False, qos: int = 0) -> bool:
+    return send_bytes(topic, msg.encode('utf-8'), retain, qos)
+
+
+def send_bytes(topic: str, payload: bytes, retain: bool = False, qos: int = 0) -> bool:
+    if not _is_connected:
+        return False
+    try:
+        _client.publish(
+            topic=topic.encode('utf-8'),
+            msg=payload,
+            retain=retain,
+            qos=qos
+        )
+    except OSError as e:
+        _on_connection_lost(e)
+        return False
+    return True
     
     
-def subscribe(topic: str, qos: int = 0):
-    global _client
-    _client.subscribe(topic.encode('utf-8'), qos)
+def subscribe(topic: str, qos: int = 0) -> bool:
+    _subscribed_topics[topic] = qos
+    if not _is_connected:
+        return False
+    try:
+        _client.subscribe(topic.encode('utf-8'), qos)
+    except OSError as e:
+        _on_connection_lost(e)
+        return False
+    return True
     
     
-def unsubscribe(topic: str):
-    global _client
-    _client.unsubscribe(topic.encode('utf-8'))
+def unsubscribe(topic: str) -> bool:
+    _subscribed_topics.pop(topic, None)
+    if not _is_connected:
+        return False
+    try:
+        _client.unsubscribe(topic.encode('utf-8'))
+    except OSError as e:
+        _on_connection_lost(e)
+        return False
+    return True
     
     
 def wait_for_any_message__B():
-    global _client
-    _client.wait_msg()
+    if not _is_connected:
+        return
+    try:
+        _client.wait_msg()
+    except OSError as e:
+        _on_connection_lost(e)
     
 
 def check_if_any_message():
-    global _client
-    _client.check_msg()
+    if not _is_connected:
+        return
+    try:
+        _client.check_msg()
+    except OSError as e:
+        _on_connection_lost(e)
+
+
+def ping_if_needed():
+    global _last_ping_timestamp
+    if not _is_connected or MQTT__KEEPALIVE_SECONDS <= 0:
+        return
+    if time.ticks_diff(time.ticks_ms(), _last_ping_timestamp) < PING_INTERVAL_MS:
+        return
+    _last_ping_timestamp = time.ticks_ms()
+    try:
+        _client.ping()
+    except OSError as e:
+        _on_connection_lost(e)
