@@ -236,3 +236,7 @@ def draw_triangle(x0: int, y0: int, x1: int, y1: int, x2: int, y2: int, color: i
 
 def draw_image(image_: image.Image, width: int, height: int, x: int = 0, y: int = 0):
     _target.show(image_, x, y, width, height)
+
+
+def draw_jpg_bytes(jpg_bytes: bytes, x: int = 0, y: int = 0):
+    _target.drawJpg(jpg_bytes, x, y)
