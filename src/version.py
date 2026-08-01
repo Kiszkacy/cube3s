@@ -1,6 +1,6 @@
 # IMPORTANT: deploy.sh parses and rewrites BUILD here, keep the "NAME: int = number" shape intact
 
-MAJOR: int = 1 # bumped by hand on new features
+MAJOR: int = 2 # bumped by hand on new features
 MINOR: int = 0 # bumped by hand on fixes
 BUILD: int = 31
 
