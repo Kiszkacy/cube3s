@@ -18,6 +18,7 @@ def on_image_received(topic: str, message: bytes):
     # TODO: draw date
 
     display.flush_canvas()
+    # TODO: gc.collect() call after drawing ?
 
 
 def get_date_as_string(day_offset: int = 0) -> str:
