@@ -9,7 +9,7 @@ import time
 import mqtt
 import version
 import wifi
-from modules import clock, dashboard, live_camera
+from modules import biomet, clock, dashboard, live_camera
 # TODO: cleanup config.py, in there should only be user secret settings like passwords, not module-specific constants
 from config import *
 
@@ -18,9 +18,10 @@ LOOP_ERROR_DELAY_MS: int = 800
 
 # module switching logic
 MODULES: dict = {
+    "biomet": biomet,
     "clock": clock,
-    "input": dashboard,
-    "live_camera": live_camera
+    "dashboard": dashboard,
+    "live_camera": live_camera,
 }
 
 # TODO: implement helper time module and daily reset logic
