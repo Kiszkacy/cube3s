@@ -6,9 +6,9 @@ from config import *
 # TODO: implement a proper dashboard
 
 
-def on_input_update(topic: str, message: str):
+def on_input_update(topic: str, message: bytes):
     display.clear_screen()
-    display.draw_text(message)
+    display.draw_text(message.decode('utf-8'))
 
 
 def initialize():

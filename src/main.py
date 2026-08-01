@@ -29,17 +29,19 @@ _current_module: str | None = None
 _pending_module: str | None = None
 
 
-def on_module_switch(topic: str, message: str):
+def on_module_switch(topic: str, message: bytes):
     # IMPORTANT: -- according to LLM --
     # this runs inside mqtt.check_if_any_message(), so it must not touch the socket itself.
     # initialize()/deinitialize() call subscribe()/unsubscribe(), which would re-enter the blocking
     # receive loop and can either hang the main loop or trip its packet id assert
     global _pending_module
-    if message not in MODULES:
-        print(f"[MAIN.ROUTER] received unknown module switch request: '{message}'.")
+    # TODO: this could crash if message was not a string
+    module_name: str = message.decode('utf-8')
+    if module_name not in MODULES:
+        print(f"[MAIN.ROUTER] received unknown module switch request: '{module_name}'.")
         return
 
-    _pending_module = message
+    _pending_module = module_name
 
 
 def apply_pending_module_switch():

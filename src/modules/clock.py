@@ -65,9 +65,9 @@ _last_interaction_ms: int = time.ticks_ms()
 _ignore_touch_until_release: bool = False # true while consuming the wake touch
 
 
-def on_mqtt_mode_switch(topic: str, message: str):
+def on_mqtt_mode_switch(topic: str, message: bytes):
     global _mode
-    message_: str = message.lower().strip()
+    message_: str = message.decode('utf-8').lower().strip()
     if message_ in ("0", "digital"):
         _mode = 0
     elif message_ in ("1", "analog"):
@@ -77,9 +77,9 @@ def on_mqtt_mode_switch(topic: str, message: str):
     print(f"[CLOCK.MQTT] mode switched to: {'digital' if _mode == 0 else 'analog'}.")
     
 
-def on_mqtt_brightness(topic: str, message: str):
+def on_mqtt_brightness(topic: str, message: bytes):
     try:
-        brightness: int = int(message)
+        brightness: int = int(message.decode('utf-8'))
         clamped_brightness: int = max(10, min(255, brightness))
         display.set_brightness(clamped_brightness)
     except ValueError:

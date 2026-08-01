@@ -37,16 +37,15 @@ def is_connected() -> bool:
 
 def handle_incoming_messages(topic: bytes, message: bytes):
     topic_str: str = topic.decode('utf-8')
-    msg_str: str = message.decode('utf-8')
 
     if topic in _message_handlers:
-        print(f"[MQTT] received: '{topic_str}' -> '{msg_str[:50]}', sending to a corresponding handler.")
+        print(f"[MQTT] received at '{topic_str}', sending to a corresponding handler.")
         try:
-            _message_handlers[topic](topic_str, msg_str)
+            _message_handlers[topic](topic_str, message)
         except Exception as e:
             print(f"[MQTT] handler for '{topic_str}' failed: '{e}'.")
     else:
-        print(f"[MQTT] received unhandled topic: '{topic_str}' -> '{msg_str[:50]}'.")
+        print(f"[MQTT] received unhandled topic: '{topic_str}' -> '{message[:50]}'.")
 
 
 def register_handler(topic: str, function):
