@@ -98,6 +98,8 @@ def initialize():
     _last_interaction_ms = time.ticks_ms()
     _ignore_touch_until_release = False
 
+    # TODO: register_handler will be called multiple times if the module is switched back and forth
+    # TODO: add unregister_handler ? or another idea
     mqtt.register_handler(CLOCK__MQTT_MODE_SWITCH_TOPIC, on_mqtt_mode_switch)
     mqtt.subscribe(CLOCK__MQTT_MODE_SWITCH_TOPIC)
     mqtt.register_handler(CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC, on_mqtt_brightness)
