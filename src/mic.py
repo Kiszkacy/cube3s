@@ -1,6 +1,8 @@
 import array
 import time
-import M5 # type: ignore
+
+import M5  # type: ignore
+
 # IMPORTANT: only speaker or mic can be enabled at a time, because they share the same bus, there are no safety checks in either module
 
 DEFAULT_SAMPLE_RATE: int = 16000 # hz

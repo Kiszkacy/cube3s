@@ -1,12 +1,12 @@
-import time
-import display
-import power
-import mqtt
-import touch
-import speaker
 import math
-from config import *
+import time
 
+import display
+import mqtt
+import power
+import speaker
+import touch
+from config import *
 
 DIGITAL_CLOCK_TEXT_SIZE: float = 10.0
 DIGITAL_CLOCK_SECONDS_TEXT_SIZE: float = 4.0
