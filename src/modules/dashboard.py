@@ -36,6 +36,12 @@ def on_input_update(topic: str, message: bytes):
 
 
 def initialize():
+    global _previous_second
+
+    display.use_canvas()
+
+    _previous_second = -1
+
     mqtt.register_handler(DASHBOARD__MQTT_INPUT_TOPIC, on_input_update)
     mqtt.subscribe(DASHBOARD__MQTT_INPUT_TOPIC)
 
@@ -43,6 +49,10 @@ def initialize():
 
 
 def deinitialize():
+    display.clear_canvas()
+    display.flush_canvas()
+    display.use_display()
+
     mqtt.unsubscribe(DASHBOARD__MQTT_INPUT_TOPIC)
 
     print("[DASH] deinitialized.")
@@ -70,9 +80,12 @@ def draw_digital_clock():
 
 
 def update():
+    global _previous_second
     current_second: int = time.localtime()[5]
 
     if _previous_second != current_second:
+        _previous_second = current_second
+
         # redraw only if second changed
         display.clear_canvas()
 

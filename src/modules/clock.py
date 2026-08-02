@@ -180,7 +180,6 @@ def draw_digital_clock():
     )
 
 
-
 def draw_analog_clock():
     now: time.struct_time = time.localtime(time.time() + UTC_OFFSET*3600)
     hours, minutes, seconds = now[3], now[4], now[5]
