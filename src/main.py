@@ -13,7 +13,7 @@ import power
 import touch
 import version
 import wifi
-from modules import biomet, clock, dashboard, live_camera
+import biomet, clock, dashboard, live_camera
 from config import MQTT__MODULE_SWITCH_TOPIC
 
 # TODO: cleanup variables and functions with and without _ to properly signal which ones are internal use only
@@ -23,7 +23,7 @@ from config import MQTT__MODULE_SWITCH_TOPIC
 LOOP_INTERVAL_MS: int = 50
 LOOP_ERROR_DELAY_MS: int = 800
 
-DEBUG__PRINT_MEMORY_STATUS: bool = True
+DEBUG__PRINT_MEMORY_STATUS: bool = False
 DEBUG__MEMORY_STATUS_INTERVAL_MS: int = 10000
 
 # module switching logic
