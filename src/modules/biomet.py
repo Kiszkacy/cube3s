@@ -13,7 +13,7 @@ _image_queued: bool = False
 
 
 def on_image_received(topic: str, message: bytes):
-    global _image_queued
+    global _image_queued, _image_bytes
     print(f"[BIOMET] received biomet.")
     _image_bytes = message
     _image_queued = True
