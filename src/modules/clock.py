@@ -2,11 +2,12 @@ import math
 import time
 
 import display
+import localtime
 import mqtt
 import power
 import speaker
 import touch
-from config import *
+from config import CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC, CLOCK__MQTT_MODE_SWITCH_TOPIC
 
 DIGITAL_CLOCK_TEXT_SIZE: float = 10.0
 DIGITAL_CLOCK_SECONDS_TEXT_SIZE: float = 4.0
@@ -61,7 +62,7 @@ _previous_second: int = -1
 _previous_awake: bool = True
 
 _awake: bool = True # whether the ui reacts to touch and shows the switch button
-_last_interaction_ms: int = time.ticks_ms()
+_last_interaction_timestamp: int = time.ticks_ms()
 _ignore_touch_until_release: bool = False # true while consuming the wake touch
 
 
@@ -88,14 +89,14 @@ def on_mqtt_brightness(topic: str, message: bytes):
 
 
 def initialize():
-    global _previous_mode, _previous_second, _previous_awake, _awake, _last_interaction_ms, _ignore_touch_until_release
+    global _previous_mode, _previous_second, _previous_awake, _awake, _last_interaction_timestamp, _ignore_touch_until_release
     display.use_canvas()
 
     _previous_mode = -1
     _previous_second = -1
     _previous_awake = True
     _awake = True
-    _last_interaction_ms = time.ticks_ms()
+    _last_interaction_timestamp = time.ticks_ms()
     _ignore_touch_until_release = False
 
     # TODO: register_handler will be called multiple times if the module is switched back and forth
@@ -122,7 +123,7 @@ def deinitialize():
 
 
 def handle_touch():
-    global _mode, _awake, _last_interaction_ms, _ignore_touch_until_release
+    global _mode, _awake, _last_interaction_timestamp, _ignore_touch_until_release
 
     if not touch.is_pressed():
         _ignore_touch_until_release = False
@@ -131,11 +132,11 @@ def handle_touch():
     if not _awake: # first touch after inactivity => wake up the ui, do not do anything else yet
         _awake = True
         _ignore_touch_until_release = True
-        _last_interaction_ms = time.ticks_ms()
+        _last_interaction_timestamp = time.ticks_ms()
         return
 
     # update last known touch interaction time
-    _last_interaction_ms = time.ticks_ms()
+    _last_interaction_timestamp = time.ticks_ms()
 
     if _ignore_touch_until_release:
         return
@@ -159,8 +160,7 @@ def handle_touch():
 
 
 def draw_digital_clock():
-    now: time.struct_time = time.localtime(time.time() + UTC_OFFSET*3600)
-    hours, minutes, seconds = now[3], now[4], now[5]
+    hours, minutes, seconds = localtime.hour(), localtime.minute(), localtime.second()
 
     y: int = display.HEIGHT // 2
     display.set_text_color(DIGITAL_CLOCK_COLOR)
@@ -181,8 +181,7 @@ def draw_digital_clock():
 
 
 def draw_analog_clock():
-    now: time.struct_time = time.localtime(time.time() + UTC_OFFSET*3600)
-    hours, minutes, seconds = now[3], now[4], now[5]
+    hours, minutes, seconds = localtime.hour(), localtime.minute(), localtime.second()
 
     display.draw_circle(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, ANALOG_CLOCK_RADIUS, color=ANALOG_CLOCK_BORDER_COLOR) # clock border
     display.draw_circle(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, 4, color=ANALOG_CLOCK_BORDER_COLOR, fill=True) # clock center
@@ -287,10 +286,10 @@ def update():
     handle_touch() # handle touch at every update loop
 
     # hide the switch button and sleep touch after was not touched for a while
-    if _awake and time.ticks_diff(time.ticks_ms(), _last_interaction_ms) > TOUCH_INACTIVITY_TIMEOUT_MS:
+    if _awake and time.ticks_diff(time.ticks_ms(), _last_interaction_timestamp) > TOUCH_INACTIVITY_TIMEOUT_MS:
         _awake = False
 
-    current_second: int = time.localtime()[5]
+    current_second: int = localtime.second()
 
     if _previous_mode != _mode or _previous_second != current_second or _previous_awake != _awake:
         _previous_mode = _mode

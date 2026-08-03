@@ -1,8 +1,7 @@
-import time
-
 import display
+import localtime
 import mqtt
-from config import *
+from config import DASHBOARD__MQTT_INPUT_TOPIC
 
 
 DASHBOARD_PADDING: int = 8
@@ -59,8 +58,7 @@ def deinitialize():
 
 
 def draw_digital_clock():
-    now: time.struct_time = time.localtime(time.time() + UTC_OFFSET*3600)
-    hours, minutes, seconds = now[3], now[4], now[5]
+    hours, minutes, seconds = localtime.hour(), localtime.minute(), localtime.second()
 
     display.set_text_color(DIGITAL_CLOCK_COLOR)
     display.set_text_size(DIGITAL_CLOCK_TEXT_SIZE)
@@ -81,7 +79,7 @@ def draw_digital_clock():
 
 def update():
     global _previous_second
-    current_second: int = time.localtime()[5]
+    current_second: int = localtime.second()
 
     if _previous_second != current_second:
         _previous_second = current_second

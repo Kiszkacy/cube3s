@@ -6,12 +6,13 @@ M5.begin()
 
 import time
 
+import localtime
 import mqtt
 import version
 import wifi
 from modules import biomet, clock, dashboard, live_camera
 # TODO: cleanup config.py, in there should only be user secret settings like passwords, not module-specific constants
-from config import *
+from config import MQTT__MODULE_SWITCH_TOPIC
 
 LOOP_INTERVAL_MS: int = 50
 LOOP_ERROR_DELAY_MS: int = 800
@@ -79,6 +80,8 @@ print("[MAIN] starting main loop.")
 while True:
     try:
         M5.update()
+        # IMPORTANT: sampled once per iteration, every module reads the sampled values instead of polling on its own
+        localtime.update()
         wifi.check_connection_reconnect_if_needed()
         mqtt.check_connection_reconnect_if_needed()
         mqtt.check_if_any_message()

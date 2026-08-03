@@ -1,7 +1,7 @@
 import mqtt
 import display
-import time
-from config import *
+import localtime
+from config import BIOMET__MQTT_IMAGE_TOPIC, MQTT__WORKER_COMMAND_TOPIC
 
 
 # TODO: implement day switch buttons
@@ -21,17 +21,11 @@ def on_image_received(topic: str, message: bytes):
     # TODO: gc.collect() call after drawing ?
 
 
-def get_date_as_string(day_offset: int = 0) -> str:
-    target_seconds: int = time.time() + (UTC_OFFSET * 3600) + (day_offset * 86400)
-    time_: time.struct_time = time.localtime(target_seconds)
-    return "{:04d}-{:02d}-{:02d}".format(time_[0], time_[1], time_[2])
-
-
 def request_biomet(day_offset: int = 0):
     global current_day_offset
     current_day_offset = day_offset
 
-    command: str = f"GET_BIOMET:{get_date_as_string(day_offset)}"
+    command: str = f"GET_BIOMET:{localtime.date_string(day_offset)}"
 
     print(f"[BIOMET] requesting biomet...")
     mqtt.send_message(MQTT__WORKER_COMMAND_TOPIC, command)

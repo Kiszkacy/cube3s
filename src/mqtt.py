@@ -2,7 +2,16 @@ import time
 
 from umqtt.simple import MQTTClient
 
-from config import *
+from config import (
+    MQTT__BROKER_ADDRESS,
+    MQTT__BROKER_PORT,
+    MQTT__KEEPALIVE_SECONDS,
+    MQTT__MY_CLIENT_ID,
+    MQTT__MY_LAST_WILL_MESSAGE,
+    MQTT__MY_LAST_WILL_TOPIC,
+    MQTT__MY_PASSWORD,
+    MQTT__MY_USERNAME,
+)
 
 # TODO: LLM added a lot of try/except blocks
 # TODO: the code seems a bit convoluted, maybe I should go over it and simplify it sometime
