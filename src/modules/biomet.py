@@ -8,17 +8,15 @@ from config import BIOMET__MQTT_IMAGE_TOPIC, MQTT__WORKER_COMMAND_TOPIC
 # TODO: add date display ?
 current_day_offset: int = 0 # -1 = yesterday, 0 = today, 1 = tomorrow
 
+_image_bytes: bytes | None = None
+_image_queued: bool = False
+
 
 def on_image_received(topic: str, message: bytes):
+    global _image_queued
     print(f"[BIOMET] received biomet.")
-
-    display.clear_screen()
-    display.draw_jpg_bytes(message, x=0, y=0)
-
-    # TODO: draw date
-
-    display.flush_canvas()
-    # TODO: gc.collect() call after drawing ?
+    _image_bytes = message
+    _image_queued = True
 
 
 def request_biomet(day_offset: int = 0):
@@ -53,4 +51,15 @@ def deinitialize():
 
 
 def update():
-    pass
+    global _image_queued
+
+    if _image_queued and _image_bytes is not None:
+        display.draw_jpg_bytes(_image_bytes, x=0, y=0)
+
+        # TODO: draw date
+
+        display.flush_canvas()
+        # TODO: gc.collect() call after drawing ?
+        
+        _image_queued = False
+    

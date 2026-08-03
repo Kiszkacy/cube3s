@@ -17,3 +17,4 @@ The upload is flat: `src/modules/clock.py` ends up as `/clock.py` next to `/main
 ## Conventions
 
 - A `__B` suffix on a function name means it is **blocking** (it waits until the operation finishes). Everything else should return immediately.
+- MQTT handlers must only **store state** and set a flag, never draw. They run inside `mqtt.check_if_any_message()`, so they can paint over a module that is about to be switched away, or draw to a target the current module never claimed. All drawing belongs in `update()`.
