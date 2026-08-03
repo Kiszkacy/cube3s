@@ -1,10 +1,11 @@
-import M5 # type: ignore
+import M5  # type: ignore
 import image
 
+from ui import COLOR_WHITE, COLOR_BLACK
 
 _display: M5.Display = M5.Display
 
-_default_clear_color: int = 0x000000
+_default_clear_color: int = COLOR_BLACK
 
 _canvas: object | None = None
 _target: object = _display
@@ -35,7 +36,7 @@ _HORIZONTAL_CENTER: int = 1
 _HORIZONTAL_RIGHT: int = 2
 
 DEFAULT_TEXT_SIZE: float = 2.0
-DEFAULT_TEXT_COLOR: int = 0xFFFFFF
+DEFAULT_TEXT_COLOR: int = COLOR_WHITE
 DEFAULT_TEXT_BACKGROUND_COLOR: int = -1 # -1 => means transparent background
 DEFAULT_TEXT_ANCHOR: int = TOP_LEFT
 
@@ -98,7 +99,7 @@ def set_target(target: object):
     _target = target
 
 
-def fill_target(target: object, color: int = 0x000000):
+def fill_target(target: object, color: int = COLOR_BLACK):
     target.fillScreen(color)
 
 
@@ -140,7 +141,7 @@ def get_brightness__RS() -> int: # 0 - 255, asks the panel directly instead of r
     return _brightness
 
 
-def fill_screen(color: int = 0x000000):
+def fill_screen(color: int = COLOR_BLACK):
     _target.fillScreen(color)
 
 
@@ -268,16 +269,16 @@ def draw_text(text: str, x: int = 0, y: int = 0, size: float | None = None, colo
             _target.unloadFont()
 
 
-def draw_pixel(x: int, y: int, color: int = 0xFFFFFF):
+def draw_pixel(x: int, y: int, color: int = COLOR_WHITE):
     _target.drawPixel(x, y, color)
 
 
-def draw_line(x_from: int, y_from: int, x_to: int, y_to: int, color: int = 0xFFFFFF):
+def draw_line(x_from: int, y_from: int, x_to: int, y_to: int, color: int = COLOR_WHITE):
     _target.drawLine(x_from, y_from, x_to, y_to, color)
 
 
 # TODO: add helper anchor points args for shapes ?
-def draw_rect(x: int, y: int, width: int, height: int, color: int = 0xFFFFFF, fill: bool = False):
+def draw_rect(x: int, y: int, width: int, height: int, color: int = COLOR_WHITE, fill: bool = False):
     if fill:
         _target.fillRect(x, y, width, height, color)
     else:
@@ -285,21 +286,21 @@ def draw_rect(x: int, y: int, width: int, height: int, color: int = 0xFFFFFF, fi
 
 
 # TODO: rename radius to border_radius/corner_radius ?
-def draw_round_rect(x: int, y: int, width: int, height: int, radius: int, color: int = 0xFFFFFF, fill: bool = False):
+def draw_round_rect(x: int, y: int, width: int, height: int, radius: int, color: int = COLOR_WHITE, fill: bool = False):
     if fill:
         _target.fillRoundRect(x, y, width, height, radius, color)
     else:
         _target.drawRoundRect(x, y, width, height, radius, color)
 
 
-def draw_circle(x: int, y: int, radius: int, color: int = 0xFFFFFF, fill: bool = False):
+def draw_circle(x: int, y: int, radius: int, color: int = COLOR_WHITE, fill: bool = False):
     if fill:
         _target.fillCircle(x, y, radius, color)
     else:
         _target.drawCircle(x, y, radius, color)
 
 
-def draw_triangle(x0: int, y0: int, x1: int, y1: int, x2: int, y2: int, color: int = 0xFFFFFF, fill: bool = False):
+def draw_triangle(x0: int, y0: int, x1: int, y1: int, x2: int, y2: int, color: int = COLOR_WHITE, fill: bool = False):
     if fill:
         _target.fillTriangle(x0, y0, x1, y1, x2, y2, color)
     else:

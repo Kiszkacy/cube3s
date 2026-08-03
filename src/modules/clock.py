@@ -8,10 +8,12 @@ import power
 import speaker
 import touch
 from config import CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC, CLOCK__MQTT_MODE_SWITCH_TOPIC
+from ui import COLOR_WHITE
+
 
 DIGITAL_CLOCK_TEXT_SIZE: float = 10.0
 DIGITAL_CLOCK_SECONDS_TEXT_SIZE: float = 4.0
-DIGITAL_CLOCK_COLOR: int = 0xFFFFFF # white
+DIGITAL_CLOCK_COLOR: int = COLOR_WHITE
 DIGITAL_CLOCK_SECONDS_COLOR: int = 0xAAAAAA # light gray
 DIGITAL_CLOCK_TEXT_X: int = display.WIDTH // 2 - 16
 DIGITAL_CLOCK_SECONDS_TEXT_X: int = display.WIDTH // 2 + 136
@@ -24,9 +26,9 @@ ANALOG_CLOCK_RADIUS: int = 100
 ANALOG_CLOCK_HOUR_HAND_LENGTH: int = 50
 ANALOG_CLOCK_MINUTE_HAND_LENGTH: int = 70
 ANALOG_CLOCK_SECOND_HAND_LENGTH: int = 90
-ANALOG_CLOCK_BORDER_COLOR: int = 0xFFFFFF # white
-ANALOG_CLOCK_HOUR_HAND_COLOR: int = 0xFFFFFF # white
-ANALOG_CLOCK_MINUTE_HAND_COLOR: int = 0xFFFFFF # white
+ANALOG_CLOCK_BORDER_COLOR: int = COLOR_WHITE
+ANALOG_CLOCK_HOUR_HAND_COLOR: int = COLOR_WHITE
+ANALOG_CLOCK_MINUTE_HAND_COLOR: int = COLOR_WHITE
 ANALOG_CLOCK_SECOND_HAND_COLOR: int = 0xFF0000 # red
 ANALOG_CLOCK_HOUR_TICK_LENGTH: int = 4
 
@@ -53,9 +55,9 @@ SWITCH_BUTTON_MARGIN: int = 8
 SWITCH_BUTTON_X: int = display.WIDTH - SWITCH_BUTTON_WIDTH - SWITCH_BUTTON_MARGIN
 SWITCH_BUTTON_Y: int = display.HEIGHT - SWITCH_BUTTON_HEIGHT - SWITCH_BUTTON_MARGIN
 SWITCH_BUTTON_FILL_COLOR: int = 0x004040 # dark cyan
-SWITCH_BUTTON_BORDER_COLOR: int = 0xFFFFFF # white
+SWITCH_BUTTON_BORDER_COLOR: int = COLOR_WHITE
 SWITCH_BUTTON_TEXT_SIZE: float = 2.0
-SWITCH_BUTTON_TEXT_COLOR: int = 0xFFFFFF # white
+SWITCH_BUTTON_TEXT_COLOR: int = COLOR_WHITE
 
 TOUCH_INACTIVITY_TIMEOUT_MS: int = 10000
 
@@ -79,7 +81,7 @@ def on_mqtt_mode_switch(topic: str, message: bytes):
     elif message_ == "toggle":
         _mode = 1 - _mode
     print(f"[CLOCK.MQTT] mode switched to: {'digital' if _mode == 0 else 'analog'}.")
-    
+
 
 def on_mqtt_brightness(topic: str, message: bytes):
     try:
@@ -110,7 +112,7 @@ def initialize():
     mqtt.subscribe(CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC)
 
     speaker.enable()
-    
+
     print("[CLOCK] initialized.")
 
 
@@ -123,7 +125,7 @@ def deinitialize():
 
     mqtt.unsubscribe(CLOCK__MQTT_MODE_SWITCH_TOPIC)
     mqtt.unsubscribe(CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC)
-    
+
     print("[CLOCK] deinitialized.")
 
 
@@ -157,7 +159,7 @@ def handle_touch():
         if touch.was_pressed():
             _mode = 1 - _mode
             speaker.beep()
-    else :
+    else:
         # outside switch button => adjust brightness
         brightness: int = int(255 * (1.0 - (y / display.HEIGHT)))
         clamped_brightness: int = max(10, min(255, brightness))
@@ -173,7 +175,6 @@ def draw_digital_clock():
     display.draw_text(":", x=DIGITAL_CLOCK_TEXT_X, y=y, anchor=display.MIDDLE_CENTER)
     display.draw_text(f"{hours:02}", x=DIGITAL_CLOCK_TEXT_X - DIGITAL_CLOCK_COLON_GAP, y=y, anchor=display.MIDDLE_RIGHT)
     display.draw_text(f"{minutes:02}", x=DIGITAL_CLOCK_TEXT_X + DIGITAL_CLOCK_COLON_GAP, y=y, anchor=display.MIDDLE_LEFT)
-
 
     display.draw_text( # smaller seconds on the right
         f"{seconds:02}",
@@ -259,8 +260,8 @@ def draw_battery():
         fill=True
     )
     display.draw_rect( # battery nub on the right side
-        x=BATTERY_ICON_X+BATTERY_ICON_WIDTH,
-        y=BATTERY_ICON_Y+(BATTERY_ICON_HEIGHT-BATTERY_NUB_HEIGHT)//2,
+        x=BATTERY_ICON_X + BATTERY_ICON_WIDTH,
+        y=BATTERY_ICON_Y + (BATTERY_ICON_HEIGHT - BATTERY_NUB_HEIGHT) // 2,
         width=BATTERY_NUB_WIDTH,
         height=BATTERY_NUB_HEIGHT,
         color=BATTERY_BACKGROUND_COLOR,
@@ -275,12 +276,12 @@ def draw_battery():
             BATTERY_CHARGING_COLOR
         )
     else:
-        battery_level_max_width: int = BATTERY_ICON_WIDTH-2*BATTERY_LEVEL_PADDING
+        battery_level_max_width: int = BATTERY_ICON_WIDTH - 2*BATTERY_LEVEL_PADDING
         display.draw_round_rect( # actual battery level, fills left -> right
-            x=BATTERY_ICON_X+BATTERY_LEVEL_PADDING,
-            y=BATTERY_ICON_Y+BATTERY_LEVEL_PADDING,
-            width=max(1, int(battery_level_max_width*(battery_level/100))),
-            height=BATTERY_ICON_HEIGHT-2*BATTERY_LEVEL_PADDING,
+            x=BATTERY_ICON_X + BATTERY_LEVEL_PADDING,
+            y=BATTERY_ICON_Y + BATTERY_LEVEL_PADDING,
+            width=max(1, int(battery_level_max_width * (battery_level/100))),
+            height=BATTERY_ICON_HEIGHT - 2 * BATTERY_LEVEL_PADDING,
             radius=2,
             color=battery_color,
             fill=True
