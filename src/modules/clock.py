@@ -64,7 +64,6 @@ TOUCH_INACTIVITY_TIMEOUT_MS: int = 10000
 
 _mode: int = 0  # 0 => digital, 1 => analog
 _previous_mode: int = -1
-_previous_second: int = -1
 _previous_awake: bool = True
 
 _awake: bool = True # whether the ui reacts to touch and shows the switch button
@@ -95,11 +94,10 @@ def on_mqtt_brightness(topic: str, message: bytes):
 
 
 def initialize():
-    global _previous_mode, _previous_second, _previous_awake, _awake, _last_interaction_timestamp, _ignore_touch_until_release
+    global _previous_mode, _previous_awake, _awake, _last_interaction_timestamp, _ignore_touch_until_release
     display.use_canvas()
 
     _previous_mode = -1
-    _previous_second = -1
     _previous_awake = True
     _awake = True
     _last_interaction_timestamp = time.ticks_ms()
@@ -200,16 +198,16 @@ def draw_analog_clock():
     minute_angle: float = math.radians((minutes + seconds / 60.0) * 6)
     second_angle: float = math.radians(seconds * 6)
 
-    hour_x: int = int(ANALOG_CLOCK_CENTER_X + (ANALOG_CLOCK_HOUR_HAND_LENGTH) * math.sin(hour_angle))
-    hour_y: int = int(ANALOG_CLOCK_CENTER_Y - (ANALOG_CLOCK_HOUR_HAND_LENGTH) * math.cos(hour_angle))
+    hour_x: int = int(ANALOG_CLOCK_CENTER_X + ANALOG_CLOCK_HOUR_HAND_LENGTH * math.sin(hour_angle))
+    hour_y: int = int(ANALOG_CLOCK_CENTER_Y - ANALOG_CLOCK_HOUR_HAND_LENGTH * math.cos(hour_angle))
     display.draw_line(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, hour_x, hour_y, color=ANALOG_CLOCK_HOUR_HAND_COLOR)
 
-    minute_x: int = int(ANALOG_CLOCK_CENTER_X + (ANALOG_CLOCK_MINUTE_HAND_LENGTH) * math.sin(minute_angle))
-    minute_y: int = int(ANALOG_CLOCK_CENTER_Y - (ANALOG_CLOCK_MINUTE_HAND_LENGTH) * math.cos(minute_angle))
+    minute_x: int = int(ANALOG_CLOCK_CENTER_X + ANALOG_CLOCK_MINUTE_HAND_LENGTH * math.sin(minute_angle))
+    minute_y: int = int(ANALOG_CLOCK_CENTER_Y - ANALOG_CLOCK_MINUTE_HAND_LENGTH * math.cos(minute_angle))
     display.draw_line(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, minute_x, minute_y, color=ANALOG_CLOCK_MINUTE_HAND_COLOR)
 
-    second_x: int = int(ANALOG_CLOCK_CENTER_X + (ANALOG_CLOCK_SECOND_HAND_LENGTH) * math.sin(second_angle))
-    second_y: int = int(ANALOG_CLOCK_CENTER_Y - (ANALOG_CLOCK_SECOND_HAND_LENGTH) * math.cos(second_angle))
+    second_x: int = int(ANALOG_CLOCK_CENTER_X + ANALOG_CLOCK_SECOND_HAND_LENGTH * math.sin(second_angle))
+    second_y: int = int(ANALOG_CLOCK_CENTER_Y - ANALOG_CLOCK_SECOND_HAND_LENGTH * math.cos(second_angle))
     display.draw_line(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, second_x, second_y, color=ANALOG_CLOCK_SECOND_HAND_COLOR)
 
 
@@ -294,7 +292,7 @@ def draw_switch_mode_button():
 
 
 def update():
-    global _previous_mode, _previous_second, _previous_awake, _awake
+    global _previous_mode, _previous_awake, _awake
 
     handle_touch() # handle touch at every update loop
 
@@ -302,11 +300,8 @@ def update():
     if _awake and time.ticks_diff(time.ticks_ms(), _last_interaction_timestamp) > TOUCH_INACTIVITY_TIMEOUT_MS:
         _awake = False
 
-    current_second: int = localtime.second()
-
-    if _previous_mode != _mode or _previous_second != current_second or _previous_awake != _awake:
+    if _previous_mode != _mode or localtime.second_changed() or _previous_awake != _awake:
         _previous_mode = _mode
-        _previous_second = current_second
         _previous_awake = _awake
 
         # redraw only if mode changed, second changed or button visibility changed
