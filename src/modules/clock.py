@@ -43,6 +43,9 @@ BATTERY_HIGH_COLOR: int = 0x00FF00 # green
 BATTERY_MEDIUM_COLOR: int = 0xFFFF00 # yellow
 BATTERY_LOW_COLOR: int = 0xFF0000 # red
 BATTERY_LEVEL_PADDING: int = 4
+BATTERY_BOLT_HALF_WIDTH: int = 5
+BATTERY_BOLT_HALF_HEIGHT: int = 9
+BATTERY_BOLT_NOTCH: int = 3
 
 SWITCH_BUTTON_WIDTH: int = 44
 SWITCH_BUTTON_HEIGHT: int = 36
@@ -213,10 +216,28 @@ def draw_analog_clock():
     display.draw_line(ANALOG_CLOCK_CENTER_X, ANALOG_CLOCK_CENTER_Y, second_x, second_y, color=ANALOG_CLOCK_SECOND_HAND_COLOR)
 
 
+def draw_battery_bolt(center_x: int, center_y: int, color: int):
+    display.draw_triangle( # upper half of the bolt
+        center_x + BATTERY_BOLT_HALF_WIDTH, center_y - BATTERY_BOLT_HALF_HEIGHT,
+        center_x - BATTERY_BOLT_HALF_WIDTH, center_y + BATTERY_BOLT_NOTCH,
+        center_x, center_y + BATTERY_BOLT_NOTCH,
+        color=color,
+        fill=True
+    )
+    display.draw_triangle( # lower half, mirrored
+        center_x - BATTERY_BOLT_HALF_WIDTH, center_y + BATTERY_BOLT_HALF_HEIGHT,
+        center_x + BATTERY_BOLT_HALF_WIDTH, center_y - BATTERY_BOLT_NOTCH,
+        center_x, center_y - BATTERY_BOLT_NOTCH,
+        color=color,
+        fill=True
+    )
+
+
 def draw_battery():
     battery_level: int = power.battery_level()
     is_battery_charging: bool = power.is_charging()
     is_usb_connected: bool = power.is_usb_connected()
+    is_battery_present: bool = power.is_battery_present()
 
     battery_color: int = BATTERY_BACKGROUND_COLOR
     if is_battery_charging or is_usb_connected:
@@ -245,16 +266,25 @@ def draw_battery():
         color=BATTERY_BACKGROUND_COLOR,
         fill=True
     )
-    battery_level_max_width: int = BATTERY_ICON_WIDTH-2*BATTERY_LEVEL_PADDING
-    display.draw_round_rect( # actual battery level, fills left -> right
-        x=BATTERY_ICON_X+BATTERY_LEVEL_PADDING,
-        y=BATTERY_ICON_Y+BATTERY_LEVEL_PADDING,
-        width=max(1, int(battery_level_max_width*(battery_level/100))),
-        height=BATTERY_ICON_HEIGHT-2*BATTERY_LEVEL_PADDING,
-        radius=2,
-        color=battery_color,
-        fill=True
-    )
+
+    # usb powered while the battery is switched off => draw a bolt instead of a level bar
+    if not is_battery_present:
+        draw_battery_bolt(
+            BATTERY_ICON_X + BATTERY_ICON_WIDTH//2,
+            BATTERY_ICON_Y + BATTERY_ICON_HEIGHT//2,
+            BATTERY_CHARGING_COLOR
+        )
+    else:
+        battery_level_max_width: int = BATTERY_ICON_WIDTH-2*BATTERY_LEVEL_PADDING
+        display.draw_round_rect( # actual battery level, fills left -> right
+            x=BATTERY_ICON_X+BATTERY_LEVEL_PADDING,
+            y=BATTERY_ICON_Y+BATTERY_LEVEL_PADDING,
+            width=max(1, int(battery_level_max_width*(battery_level/100))),
+            height=BATTERY_ICON_HEIGHT-2*BATTERY_LEVEL_PADDING,
+            radius=2,
+            color=battery_color,
+            fill=True
+        )
 
 
 def draw_switch_mode_button():
