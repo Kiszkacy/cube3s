@@ -19,16 +19,16 @@ fi
 cd src
 FILES_TO_COPY=()
 
-if [ -f "../$MARKER_FILE" ]; then
+if [ -f "../$MARKER_FILE" ] && [ -z "${DEPLOY_ALL:-}" ]; then # DEPLOY_ALL is set by deploy-all.sh
     while IFS= read -r -d '' file; do
         filename="${file#./}"
         FILES_TO_COPY+=("$filename")
-    done < <(find . -type f ! -name "*.example.py" ! -name "version.py" -newer "../$MARKER_FILE" -print0)
+    done < <(find . -type f ! -name "*.example.py" ! -name "version.py" ! -path "*/__pycache__/*" -newer "../$MARKER_FILE" -print0)
 else
     while IFS= read -r -d '' file; do
         filename="${file#./}"
         FILES_TO_COPY+=("$filename")
-    done < <(find . -type f ! -name "*.example.py" ! -name "version.py" -print0)
+    done < <(find . -type f ! -name "*.example.py" ! -name "version.py" ! -path "*/__pycache__/*" -print0)
 fi
 cd ..
 
@@ -65,6 +65,8 @@ for f in "${FILES_TO_COPY[@]}"; do
     PATHS_TO_COPY+=("src/$f")
 done
 
+# IMPORTANT: mpremote cp only keeps the file name, so src/modules/clock.py lands next to main.py in the device root.
+# That is intended, the modules/ folder only exists to keep the repository tidy
 mpremote cp "${PATHS_TO_COPY[@]}" : + repl
 
 touch "$MARKER_FILE"

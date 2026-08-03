@@ -2,3 +2,4 @@
 .idea/
 src/config.py
 .deploy_marker
+__pycache__/
