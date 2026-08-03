@@ -23,7 +23,7 @@ def update():
         return
 
     if not cam.is_enabled():
-        display.draw_text("Camera Init Error", x=display.WIDTH//2, y=display.HEIGHT//2, anchor="middle-center", color=0xFF0000)
+        display.draw_text("Camera Init Error", x=display.WIDTH//2, y=display.HEIGHT//2, anchor=display.MIDDLE_CENTER, color=0xFF0000)
         _printed_error_message = True
         return
 

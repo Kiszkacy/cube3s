@@ -62,9 +62,9 @@ def draw_digital_clock():
 
     display.set_text_color(DIGITAL_CLOCK_COLOR)
     display.set_text_size(DIGITAL_CLOCK_TEXT_SIZE)
-    display.draw_text(":", x=DIGITAL_CLOCK_TEXT_X, y=DIGITAL_CLOCK_TEXT_Y, anchor="middle-center")
-    display.draw_text(f"{hours:02}", x=DIGITAL_CLOCK_TEXT_X - DIGITAL_CLOCK_COLON_GAP, y=DIGITAL_CLOCK_TEXT_Y, anchor="middle-right")
-    display.draw_text(f"{minutes:02}", x=DIGITAL_CLOCK_TEXT_X + DIGITAL_CLOCK_COLON_GAP, y=DIGITAL_CLOCK_TEXT_Y, anchor="middle-left")
+    display.draw_text(":", x=DIGITAL_CLOCK_TEXT_X, y=DIGITAL_CLOCK_TEXT_Y, anchor=display.MIDDLE_CENTER)
+    display.draw_text(f"{hours:02}", x=DIGITAL_CLOCK_TEXT_X - DIGITAL_CLOCK_COLON_GAP, y=DIGITAL_CLOCK_TEXT_Y, anchor=display.MIDDLE_RIGHT)
+    display.draw_text(f"{minutes:02}", x=DIGITAL_CLOCK_TEXT_X + DIGITAL_CLOCK_COLON_GAP, y=DIGITAL_CLOCK_TEXT_Y, anchor=display.MIDDLE_LEFT)
 
 
     display.draw_text( # smaller seconds on the right
@@ -72,7 +72,7 @@ def draw_digital_clock():
         x=DIGITAL_CLOCK_SECONDS_TEXT_X,
         y=DIGITAL_CLOCK_SECONDS_TEXT_Y,
         size=DIGITAL_CLOCK_SECONDS_TEXT_SIZE,
-        anchor="middle-center",
+        anchor=display.MIDDLE_CENTER,
         color=DIGITAL_CLOCK_SECONDS_COLOR
     )
 

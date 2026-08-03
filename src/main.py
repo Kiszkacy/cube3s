@@ -14,8 +14,10 @@ import touch
 import version
 import wifi
 from modules import biomet, clock, dashboard, live_camera
-# TODO: cleanup config.py, in there should only be user secret settings like passwords, not module-specific constants
 from config import MQTT__MODULE_SWITCH_TOPIC
+
+# TODO: cleanup variables and functions with and without _ to properly signal which ones are internal use only
+# TODO: cleanup config.py, in there should only be user secret settings like passwords, not module-specific constants
 
 LOOP_INTERVAL_MS: int = 50
 LOOP_ERROR_DELAY_MS: int = 800
