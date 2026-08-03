@@ -116,6 +116,8 @@ def deinitialize():
     display.flush_canvas()
     display.use_display()
 
+    speaker.disable()
+
     mqtt.unsubscribe(CLOCK__MQTT_MODE_SWITCH_TOPIC)
     mqtt.unsubscribe(CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC)
     
