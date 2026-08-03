@@ -61,8 +61,8 @@ def draw_button(
         display.draw_text(label, x=rect_[0] + rect_[2]//2, y=rect_[1] + rect_[3]//2, size=text_size, anchor=display.MIDDLE_CENTER, color=text_color, background_color=fill_color)
 
 
-def draw_separator(y: int, x_from: int = 0, x_to: int = display.WIDTH, color: int = SEPARATOR_COLOR):
-    display.draw_line(x_from, y, x_to, y, color=color)
+def draw_separator(x: int, y_top: int, height: int = 16, color: int = SEPARATOR_COLOR):
+    display.draw_line(x, y_top, x, y_top+height, color=color)
 
 
 def draw_bar(rect_: tuple, progress: float, color: int, background_color: int = BAR_BACKGROUND_COLOR):
