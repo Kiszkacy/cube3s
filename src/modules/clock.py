@@ -7,6 +7,7 @@ import mqtt
 import power
 import speaker
 import touch
+import ui
 from config import CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC, CLOCK__MQTT_MODE_SWITCH_TOPIC
 from ui import COLOR_WHITE
 
@@ -36,9 +37,8 @@ BATTERY_ICON_WIDTH: int = 48
 BATTERY_ICON_HEIGHT: int = 28
 BATTERY_NUB_WIDTH: int = 4
 BATTERY_NUB_HEIGHT: int = 12
-BATTERY_MARGIN: int = 8
-BATTERY_ICON_X: int = display.WIDTH - BATTERY_ICON_WIDTH - BATTERY_NUB_WIDTH - BATTERY_MARGIN
-BATTERY_ICON_Y: int = BATTERY_MARGIN
+BATTERY_ICON_X: int = display.WIDTH - BATTERY_ICON_WIDTH - BATTERY_NUB_WIDTH - ui.SCREEN_PADDING
+BATTERY_ICON_Y: int = ui.SCREEN_PADDING
 BATTERY_BACKGROUND_COLOR: int = 0x555555 # dark gray
 BATTERY_CHARGING_COLOR: int = 0x00FFFF # cyan
 BATTERY_HIGH_COLOR: int = 0x00FF00 # green
@@ -49,11 +49,12 @@ BATTERY_BOLT_HALF_WIDTH: int = 5
 BATTERY_BOLT_HALF_HEIGHT: int = 9
 BATTERY_BOLT_NOTCH: int = 3
 
-SWITCH_BUTTON_WIDTH: int = 44
-SWITCH_BUTTON_HEIGHT: int = 36
-SWITCH_BUTTON_MARGIN: int = 8
-SWITCH_BUTTON_X: int = display.WIDTH - SWITCH_BUTTON_WIDTH - SWITCH_BUTTON_MARGIN
-SWITCH_BUTTON_Y: int = display.HEIGHT - SWITCH_BUTTON_HEIGHT - SWITCH_BUTTON_MARGIN
+SWITCH_BUTTON: tuple = ui.rect(
+    display.WIDTH - 44 - ui.SCREEN_PADDING,
+    display.HEIGHT - 36 - ui.SCREEN_PADDING,
+    44,
+    36
+)
 SWITCH_BUTTON_FILL_COLOR: int = 0x004040 # dark cyan
 SWITCH_BUTTON_BORDER_COLOR: int = COLOR_WHITE
 SWITCH_BUTTON_TEXT_SIZE: float = 2.0
@@ -149,12 +150,7 @@ def handle_touch():
         return
 
     x, y = touch.position()
-    is_inside_button: bool = (
-            (SWITCH_BUTTON_X <= x <= SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH)
-        and (SWITCH_BUTTON_Y <= y <= SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT)
-    )
-
-    if is_inside_button:
+    if ui.is_inside(x, y, SWITCH_BUTTON):
         # inside switch button => switch mode
         if touch.was_pressed():
             _mode = 1 - _mode
@@ -271,9 +267,7 @@ def draw_battery():
     # usb powered while the battery is switched off => draw a bolt instead of a level bar
     if not is_battery_present:
         draw_battery_bolt(
-            BATTERY_ICON_X + BATTERY_ICON_WIDTH//2,
-            BATTERY_ICON_Y + BATTERY_ICON_HEIGHT//2,
-            BATTERY_CHARGING_COLOR
+            center_x=BATTERY_ICON_X + BATTERY_ICON_WIDTH//2, center_y=BATTERY_ICON_Y + BATTERY_ICON_HEIGHT//2, color=BATTERY_CHARGING_COLOR
         )
     else:
         battery_level_max_width: int = BATTERY_ICON_WIDTH - 2*BATTERY_LEVEL_PADDING
@@ -281,7 +275,7 @@ def draw_battery():
             x=BATTERY_ICON_X + BATTERY_LEVEL_PADDING,
             y=BATTERY_ICON_Y + BATTERY_LEVEL_PADDING,
             width=max(1, int(battery_level_max_width * (battery_level/100))),
-            height=BATTERY_ICON_HEIGHT - 2 * BATTERY_LEVEL_PADDING,
+            height=BATTERY_ICON_HEIGHT - 2*BATTERY_LEVEL_PADDING,
             radius=2,
             color=battery_color,
             fill=True
@@ -289,27 +283,13 @@ def draw_battery():
 
 
 def draw_switch_mode_button():
-    display.draw_round_rect(
-        SWITCH_BUTTON_X, SWITCH_BUTTON_Y, SWITCH_BUTTON_WIDTH, SWITCH_BUTTON_HEIGHT,
-        radius=4,
-        color=SWITCH_BUTTON_FILL_COLOR,
-        fill=True
-    )
-    display.draw_round_rect(
-        SWITCH_BUTTON_X, SWITCH_BUTTON_Y, SWITCH_BUTTON_WIDTH, SWITCH_BUTTON_HEIGHT,
-        radius=4,
-        color=SWITCH_BUTTON_BORDER_COLOR
-    )
-
-    label: str = "ANA" if _mode == 0 else "DIG"
-    display.draw_text(
-        label,
-        x=SWITCH_BUTTON_X + SWITCH_BUTTON_WIDTH//2,
-        y=SWITCH_BUTTON_Y + SWITCH_BUTTON_HEIGHT//2,
-        size=SWITCH_BUTTON_TEXT_SIZE,
-        anchor=display.MIDDLE_CENTER,
-        color=SWITCH_BUTTON_TEXT_COLOR,
-        background_color=SWITCH_BUTTON_FILL_COLOR
+    ui.draw_button(
+        SWITCH_BUTTON,
+        label="ANA" if _mode == 0 else "DIG",
+        fill_color=SWITCH_BUTTON_FILL_COLOR,
+        border_color=SWITCH_BUTTON_BORDER_COLOR,
+        text_color=SWITCH_BUTTON_TEXT_COLOR,
+        text_size=SWITCH_BUTTON_TEXT_SIZE
     )
 
 
