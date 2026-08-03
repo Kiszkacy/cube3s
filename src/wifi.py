@@ -2,17 +2,25 @@ import time
 
 import network
 
-from config import *
+from config import WIFI__PASSWORD, WIFI__SSID, WIFI__TIMEOUT_SECONDS
 
 
 RETRY_INTERVAL_MS: int = 10000
 
 
 _next_retry_timestamp: int = 0
+_wlan: network.WLAN | None = None
+
+
+def interface() -> network.WLAN: # cached, network.WLAN() allocates a new object on every call
+    global _wlan
+    if _wlan is None:
+        _wlan = network.WLAN(network.STA_IF)
+    return _wlan
 
 
 def connect__B() -> bool:
-    wlan: network.WLAN = network.WLAN(network.STA_IF)
+    wlan: network.WLAN = interface()
     wlan.active(True)
 
     if wlan.isconnected():
@@ -38,7 +46,7 @@ def connect__B() -> bool:
 
 def check_connection_reconnect_if_needed():
     global _next_retry_timestamp
-    wlan: network.WLAN = network.WLAN(network.STA_IF)
+    wlan: network.WLAN = interface()
     if wlan.isconnected():
         return
     if time.ticks_diff(time.ticks_ms(), _next_retry_timestamp) < 0:
@@ -54,12 +62,11 @@ def check_connection_reconnect_if_needed():
 
 
 def disconnect():
-    wlan: network.WLAN = network.WLAN(network.STA_IF)
+    wlan: network.WLAN = interface()
     if wlan.isconnected():
         wlan.disconnect()
     wlan.active(False)
 
 
 def is_connected() -> bool:
-    wlan: network.WLAN = network.WLAN(network.STA_IF)
-    return wlan.isconnected()
+    return interface().isconnected()
