@@ -9,6 +9,8 @@ import time
 
 import localtime
 import mqtt
+import power
+import touch
 import version
 import wifi
 from modules import biomet, clock, dashboard, live_camera
@@ -102,6 +104,9 @@ while True:
         M5.update()
         # IMPORTANT: sampled once per iteration, every module reads the sampled values instead of polling on its own
         localtime.update()
+        touch.update()
+        power.update()
+
         wifi.check_connection_reconnect_if_needed()
         mqtt.check_connection_reconnect_if_needed()
         mqtt.check_if_any_message()

@@ -17,4 +17,7 @@ The upload is flat: `src/modules/clock.py` ends up as `/clock.py` next to `/main
 ## Conventions
 
 - A `__B` suffix on a function name means it is **blocking** (it waits until the operation finishes). Everything else should return immediately.
+- A `__RS` suffix on a getter means it **resamples** (it talks to the hardware right away and refreshes the cached value). The plain getter returns the value sampled by that module's `update()`, which is what drawing code should use. Example: `power.battery_level()` is free, `power.battery_level__RS()` costs an I2C transaction.
 - MQTT handlers must only **store state** and set a flag, never draw. They run inside `mqtt.check_if_any_message()`, so they can paint over a module that is about to be switched away, or draw to a target the current module never claimed. All drawing belongs in `update()`.
+- Helpers with an `update()` (`localtime`, `touch`, `power`) are sampled once per iteration in `main.py`. Modules read the sampled values instead of polling the hardware or `time` on their own.
+- A module that calls `display.use_canvas()` in `initialize()` must call `display.use_display()` in `deinitialize()`, and delete every canvas it created with `display.create_canvas()`.

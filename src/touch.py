@@ -3,52 +3,76 @@ import M5 # type: ignore
 
 _touch: M5.Touch = M5.Touch
 
-# TODO: cleanup and rename some to easier understand which call does what
+# TODO: cleanup and rename some touch functions to make it easier to understand which call does what
 # TODO: https://docs.m5stack.com/en/arduino/m5unified/touch_class#touch-detail
 
+# IMPORTANT: every getter here returns the value sampled by update(), a __RS variant reads the value immediately
 
-def offset_x(touch_index: int = 0) -> int: # distance since last sampling
-    return _touch.getDetail(touch_index)[0]
+# (offset_x, offset_y, distance_x, distance_y, is_pressed, was_pressed, was_clicked, is_released, was_released, is_holding, was_held)
+_NOT_TOUCHED_DETAIL: tuple = (0, 0, 0, 0, False, False, False, True, False, False, False)
 
-
-def offset_y(touch_index: int = 0) -> int: # distance since last sampling
-    return _touch.getDetail(touch_index)[1]
-
-
-def distance_x(touch_index: int = 0) -> int: # distance since first sample
-    return _touch.getDetail(touch_index)[2]
+_detail: tuple = _NOT_TOUCHED_DETAIL
+_x: int = 0
+_y: int = 0
 
 
-def distance_y(touch_index: int = 0) -> int: # distance since first sample
-    return _touch.getDetail(touch_index)[3]
+def update(touch_index: int = 0): # IMPORTANT: has to be called once per main loop iteration, before the running module updates
+    global _detail, _x, _y
+    _detail = _touch.getDetail(touch_index)
+    _x = _touch.getX()
+    _y = _touch.getY()
 
 
-def is_pressed(touch_index: int = 0) -> bool:
-    return _touch.getDetail(touch_index)[4]
+def detail() -> tuple:
+    return _detail
 
 
-def was_pressed(touch_index: int = 0) -> bool:
-    return _touch.getDetail(touch_index)[5]
+def detail__RS(touch_index: int = 0) -> tuple: # TODO: the only way of getting second touch point detail, improve ?
+    return _touch.getDetail(touch_index)
 
 
-def was_clicked(touch_index: int = 0) -> bool:
-    return _touch.getDetail(touch_index)[6]
+def offset_x() -> int: # distance since last sampling
+    return _detail[0]
 
 
-def is_released(touch_index: int = 0) -> bool:
-    return _touch.getDetail(touch_index)[7]
+def offset_y() -> int: # distance since last sampling
+    return _detail[1]
 
 
-def was_released(touch_index: int = 0) -> bool:
-    return _touch.getDetail(touch_index)[8]
+def distance_x() -> int: # distance since first sample
+    return _detail[2]
 
 
-def is_holding(touch_index: int = 0) -> bool:
-    return _touch.getDetail(touch_index)[9]
+def distance_y() -> int: # distance since first sample
+    return _detail[3]
 
 
-def was_held(touch_index: int = 0) -> bool: # user started holding
-    return _touch.getDetail(touch_index)[10]
+def is_pressed() -> bool:
+    return _detail[4]
+
+
+def was_pressed() -> bool:
+    return _detail[5]
+
+
+def was_clicked() -> bool:
+    return _detail[6]
+
+
+def is_released() -> bool:
+    return _detail[7]
+
+
+def was_released() -> bool:
+    return _detail[8]
+
+
+def is_holding() -> bool:
+    return _detail[9]
+
+
+def was_held() -> bool: # user started holding at this frame
+    return _detail[10]
 
 
 def touch_count() -> int:
@@ -56,12 +80,24 @@ def touch_count() -> int:
 
 
 def position() -> tuple[int, int]:
+    return _x, _y
+
+
+def position__RS() -> tuple[int, int]:
     return _touch.getX(), _touch.getY()
 
 
 def x_position() -> int:
+    return _x
+
+
+def x_position__RS() -> int:
     return _touch.getX()
 
 
 def y_position() -> int:
+    return _y
+
+
+def y_position__RS() -> int:
     return _touch.getY()
