@@ -1,7 +1,3 @@
-# single source of the current time for the whole app.
-# time.localtime() allocates a new tuple on every call, so it is expanded once per main loop iteration
-# instead of once per module per frame
-
 import time
 
 from config import UTC_OFFSET
