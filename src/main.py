@@ -4,6 +4,7 @@ import M5 # type: ignore
 # so any global variables in the other modules that use M5 are initialized correctly
 M5.begin()
 
+import gc
 import time
 
 import localtime
@@ -17,6 +18,9 @@ from config import MQTT__MODULE_SWITCH_TOPIC
 LOOP_INTERVAL_MS: int = 50
 LOOP_ERROR_DELAY_MS: int = 800
 
+DEBUG__PRINT_MEMORY_STATUS: bool = True
+DEBUG__MEMORY_STATUS_INTERVAL_MS: int = 10000
+
 # module switching logic
 MODULES: dict = {
     "biomet": biomet,
@@ -29,6 +33,22 @@ MODULES: dict = {
 
 _current_module: str | None = None
 _pending_module: str | None = None
+
+_next_memory_status_timestamp: int = 0
+
+
+def print_memory_status_if_needed():
+    global _next_memory_status_timestamp
+    if not DEBUG__PRINT_MEMORY_STATUS:
+        return
+    if time.ticks_diff(time.ticks_ms(), _next_memory_status_timestamp) < 0:
+        return
+    _next_memory_status_timestamp = time.ticks_add(time.ticks_ms(), DEBUG__MEMORY_STATUS_INTERVAL_MS)
+
+    used: int = gc.mem_alloc()
+    free: int = gc.mem_free()
+    total: int = used + free
+    print(f"[MAIN.MEMORY] {used//1024}kb used, {free//1024}kb free, {total//1024}kb total ({used*100//total}% used).")
 
 
 def on_module_switch(topic: str, message: bytes):
@@ -90,6 +110,8 @@ while True:
 
         if _current_module:
             MODULES[_current_module].update()
+
+        print_memory_status_if_needed()
     except Exception as e:
         print(f"[MAIN] unhandled error in main loop: '{e}'.")
         time.sleep_ms(LOOP_ERROR_DELAY_MS)
