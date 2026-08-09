@@ -1,7 +1,7 @@
 import mqtt
 import display
 import localtime
-from config import BIOMET__MQTT_IMAGE_TOPIC, MQTT__WORKER_COMMAND_TOPIC
+from config import BIOMET__MQTT_IMAGE_RECEIVE_TOPIC, MQTT__WORKER_TOPIC
 
 
 # TODO: implement day switch buttons
@@ -14,7 +14,13 @@ _image_queued: bool = False
 
 def on_image_received(topic: str, message: bytes):
     global _image_queued, _image_bytes
-    print(f"[BIOMET] received biomet.")
+
+    if message.startswith(b"ERROR:"):
+        print(f"[BIOMET] Worker failed to provide image: {message.decode()}")
+        # TODO: error display flag
+        return
+
+    print(f"[BIOMET] received biomet image ({len(message)} bytes).")
     _image_bytes = message
     _image_queued = True
 
@@ -26,14 +32,14 @@ def request_biomet(day_offset: int = 0):
     command: str = f"GET_BIOMET:{localtime.date_string(day_offset)}"
 
     print(f"[BIOMET] requesting biomet...")
-    mqtt.send_message(MQTT__WORKER_COMMAND_TOPIC, command)
+    mqtt.send_message(MQTT__WORKER_TOPIC, command)
 
 
 def initialize():
     display.use_canvas()
 
-    mqtt.register_handler(BIOMET__MQTT_IMAGE_TOPIC, on_image_received)
-    mqtt.subscribe(BIOMET__MQTT_IMAGE_TOPIC)
+    mqtt.register_handler(BIOMET__MQTT_IMAGE_RECEIVE_TOPIC, on_image_received)
+    mqtt.subscribe(BIOMET__MQTT_IMAGE_RECEIVE_TOPIC)
 
     request_biomet(current_day_offset) # should remember last day that user looked at
 
@@ -45,7 +51,7 @@ def deinitialize():
     display.flush_canvas()
     display.use_display()
 
-    mqtt.unsubscribe(BIOMET__MQTT_IMAGE_TOPIC)
+    mqtt.unsubscribe(BIOMET__MQTT_IMAGE_RECEIVE_TOPIC)
 
     print("[BIOMET] deinitialized.")
 
