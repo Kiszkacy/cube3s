@@ -1,8 +1,38 @@
-import mqtt
 import display
 import localtime
-from config import BIOMET__MQTT_IMAGE_RECEIVE_TOPIC, MQTT__WORKER_TOPIC
+import mqtt
+import ui
+from config import BIOMET__MQTT_IMAGE_RECEIVE_TOPIC, MQTT__WORKER_TOPIC, BIOMET__MQTT_IMAGE_REQUEST_WORKER_TOPIC_SUFFIX
 
+MODE_SWITCH_BUTTON: tuple = ui.rect(
+    display.WIDTH - 44 - ui.SCREEN_PADDING,
+    display.HEIGHT - 36 - ui.SCREEN_PADDING,
+    44,
+    36
+)
+
+
+NEXT_DAY_SWITCH_BUTTON: tuple = ui.rect(
+    display.WIDTH - 24 - ui.SCREEN_PADDING,
+    display.HEIGHT//2 - 72//2 - ui.SCREEN_PADDING//2,
+    24,
+    72
+)
+
+PREV_DAY_SWITCH_BUTTON: tuple = ui.rect(
+    ui.SCREEN_PADDING,
+    display.HEIGHT//2 - 72//2 - ui.SCREEN_PADDING//2,
+    24,
+    72
+)
+
+MODE_SWITCH_BUTTON_FILL_COLOR: int = 0x004040 # dark cyan
+MODE_SWITCH_BUTTON_BORDER_COLOR: int = ui.COLOR_WHITE
+BUTTON_TEXT_SIZE: float = 2.0
+BUTTON_TEXT_COLOR: int = ui.COLOR_WHITE
+
+
+_mode: int = 0 # 0 => medical, 1 => personal
 
 # TODO: implement day switch buttons
 # TODO: add date display ?
@@ -29,10 +59,9 @@ def request_biomet(day_offset: int = 0):
     global current_day_offset
     current_day_offset = day_offset
 
-    command: str = f"GET_BIOMET:{localtime.date_string(day_offset)}"
-
+    command: str = f"{day_offset}"
     print(f"[BIOMET] requesting biomet...")
-    mqtt.send_message(MQTT__WORKER_TOPIC, command)
+    mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_IMAGE_REQUEST_WORKER_TOPIC_SUFFIX}", command)
 
 
 def initialize():
@@ -56,11 +85,57 @@ def deinitialize():
     print("[BIOMET] deinitialized.")
 
 
+def draw_received_image():
+    display.draw_jpg_bytes(_image_bytes, x=0, y=0)
+
+
+def draw_buttons():
+    ui.draw_button(
+        MODE_SWITCH_BUTTON,
+        label="MED" if _mode == 0 else "DIG",
+        fill_color=MODE_SWITCH_BUTTON_FILL_COLOR,
+        border_color=MODE_SWITCH_BUTTON_FILL_COLOR,
+        text_color=BUTTON_TEXT_COLOR,
+        text_size=BUTTON_TEXT_SIZE
+    )
+
+    ui.draw_button(
+        NEXT_DAY_SWITCH_BUTTON,
+        label=">",
+        fill_color=MODE_SWITCH_BUTTON_FILL_COLOR,
+        border_color=MODE_SWITCH_BUTTON_FILL_COLOR,
+        text_color=BUTTON_TEXT_COLOR,
+        text_size=BUTTON_TEXT_SIZE
+    )
+
+    ui.draw_button(
+        PREV_DAY_SWITCH_BUTTON,
+        label="<",
+        fill_color=MODE_SWITCH_BUTTON_FILL_COLOR,
+        border_color=MODE_SWITCH_BUTTON_FILL_COLOR,
+        text_color=BUTTON_TEXT_COLOR,
+        text_size=BUTTON_TEXT_SIZE
+    )
+
+
+def draw_date():
+    display.draw_text(
+        f"{localtime.year()}.{localtime.month():02d}.{localtime.day():02d}",
+        x=ui.SCREEN_PADDING,
+        y=display.HEIGHT-ui.SCREEN_PADDING-16,
+        size=2.0,
+        anchor=display.TOP_LEFT,
+        color=ui.COLOR_WHITE
+    )
+
+
 def update():
     global _image_queued
 
     if _image_queued and _image_bytes is not None:
-        display.draw_jpg_bytes(_image_bytes, x=0, y=0)
+        draw_received_image()
+        draw_buttons()
+        draw_date()
 
         # TODO: draw date
 
