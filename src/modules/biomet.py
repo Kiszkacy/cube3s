@@ -1,7 +1,9 @@
 import display
 import localtime
 import mqtt
+import touch
 import ui
+import common
 from config import BIOMET__MQTT_IMAGE_RECEIVE_TOPIC, MQTT__WORKER_TOPIC, BIOMET__MQTT_IMAGE_REQUEST_WORKER_TOPIC_SUFFIX
 
 MODE_SWITCH_BUTTON: tuple = ui.rect(
@@ -30,7 +32,11 @@ MODE_SWITCH_BUTTON_FILL_COLOR: int = 0x004040 # dark cyan
 MODE_SWITCH_BUTTON_BORDER_COLOR: int = ui.COLOR_WHITE
 BUTTON_TEXT_SIZE: float = 2.0
 BUTTON_TEXT_COLOR: int = ui.COLOR_WHITE
-
+BUTTONS: tuple[tuple, ...] = [
+    MODE_SWITCH_BUTTON,
+    NEXT_DAY_SWITCH_BUTTON,
+    PREV_DAY_SWITCH_BUTTON,
+]
 
 _mode: int = 0 # 0 => medical, 1 => personal
 
@@ -129,8 +135,21 @@ def draw_date():
     )
 
 
+def handle_touch():
+    if not touch.is_pressed():
+        return
+
+    x, y = touch.position()
+    if ui.is_inside_which(x, y, BUTTONS) != -1:
+        return
+
+    common.set_brightness_from_vertical_position(y)
+
+
 def update():
     global _image_queued
+
+    handle_touch()
 
     if _image_queued and _image_bytes is not None:
         draw_received_image()

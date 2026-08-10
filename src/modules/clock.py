@@ -4,6 +4,7 @@ import time
 import display
 import localtime
 import mqtt
+import common
 import power
 import speaker
 import touch
@@ -155,9 +156,7 @@ def handle_touch():
             speaker.beep()
     else:
         # outside switch button => adjust brightness
-        brightness: int = int(255 * (1.0 - (y / display.HEIGHT)))
-        clamped_brightness: int = max(10, min(255, brightness))
-        display.set_brightness(clamped_brightness)
+        common.set_brightness_from_vertical_position(y)
 
 
 def draw_digital_clock():
