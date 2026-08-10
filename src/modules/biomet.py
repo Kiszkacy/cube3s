@@ -18,16 +18,16 @@ MODE_SWITCH_BUTTON: tuple = ui.rect(
 
 NEXT_DAY_SWITCH_BUTTON: tuple = ui.rect(
     display.WIDTH - 24 - ui.SCREEN_PADDING,
-    display.HEIGHT//2 - 72//2 - ui.SCREEN_PADDING//2,
+    display.HEIGHT//2 - 96//2 - ui.SCREEN_PADDING//2,
     24,
-    72
+    96
 )
 
 PREV_DAY_SWITCH_BUTTON: tuple = ui.rect(
     ui.SCREEN_PADDING,
-    display.HEIGHT//2 - 72//2 - ui.SCREEN_PADDING//2,
+    display.HEIGHT//2 - 96//2 - ui.SCREEN_PADDING//2,
     24,
-    72
+    96
 )
 
 BACK_TO_DASHBOARD_BUTTON: tuple = ui.rect(
@@ -39,65 +39,67 @@ BACK_TO_DASHBOARD_BUTTON: tuple = ui.rect(
 BACK_TO_DASHBOARD_BUTTON_FILL_COLOR: int = 0x400000 # dark red
 BACK_TO_DASHBOARD_BUTTON_BORDER_COLOR: int = ui.COLOR_WHITE
 
-RATING_DIALOG_BUTTON: tuple = ui.rect(
+SCORE_DIALOG_BUTTON: tuple = ui.rect(
     display.WIDTH - 44 - ui.SCREEN_PADDING,
     ui.SCREEN_PADDING,
     44,
     36
 )
-RATING_DIALOG_BUTTON_FILL_COLOR: int = 0x004000 # dark green
-RATING_DIALOG_BUTTON_BORDER_COLOR: int = ui.COLOR_WHITE
+SCORE_DIALOG_BUTTON_FILL_COLOR: int = 0x004000 # dark green
+SCORE_DIALOG_BUTTON_BORDER_COLOR: int = ui.COLOR_WHITE
+SCORE_DIALOG_BUTTON_EXIT_FILL_COLOR: int = 0x400000 # dark red
+SCORE_DIALOG_BUTTON_EXIT_BORDER_COLOR: int = ui.COLOR_WHITE
 
-RATING_DIALOG: tuple = ui.rect_around(
+SCORE_DIALOG: tuple = ui.rect_around(
     display.WIDTH // 2,
     display.HEIGHT // 2,
     272,
     116
 )
-RATING_DIALOG_FILL_COLOR: int = 0x101820 # very dark blue
-RATING_DIALOG_BORDER_COLOR: int = ui.COLOR_WHITE
-RATING_DIALOG_TEXT_COLOR: int = ui.COLOR_WHITE
-RATING_DIALOG_TEXT_SIZE: float = 2.0
+SCORE_DIALOG_FILL_COLOR: int = 0x101820 # very dark blue
+SCORE_DIALOG_BORDER_COLOR: int = ui.COLOR_WHITE
+SCORE_DIALOG_TEXT_COLOR: int = ui.COLOR_WHITE
+SCORE_DIALOG_TEXT_SIZE: float = 2.0
 
-RATING_BUTTON_WIDTH: int = 44
-RATING_BUTTON_HEIGHT: int = 36
-RATING_BUTTON_GAP: int = 8
-RATING_BUTTONS_Y: int = RATING_DIALOG[1] + 64
-RATING_BUTTONS_START_X: int = (display.WIDTH - (5 * RATING_BUTTON_WIDTH + 4 * RATING_BUTTON_GAP)) // 2
+SCORE_BUTTON_WIDTH: int = 44
+SCORE_BUTTON_HEIGHT: int = 36
+SCORE_BUTTON_GAP: int = 8
+SCORE_BUTTONS_Y: int = SCORE_DIALOG[1] + 64
+SCORE_BUTTONS_START_X: int = (display.WIDTH - (5 * SCORE_BUTTON_WIDTH + 4 * SCORE_BUTTON_GAP)) // 2
 
-RATING_1_BUTTON: tuple = ui.rect(
-    RATING_BUTTONS_START_X + 0 * (RATING_BUTTON_WIDTH + RATING_BUTTON_GAP),
-    RATING_BUTTONS_Y,
-    RATING_BUTTON_WIDTH,
-    RATING_BUTTON_HEIGHT
+SCORE_1_BUTTON: tuple = ui.rect(
+    SCORE_BUTTONS_START_X + 0 * (SCORE_BUTTON_WIDTH + SCORE_BUTTON_GAP),
+    SCORE_BUTTONS_Y,
+    SCORE_BUTTON_WIDTH,
+    SCORE_BUTTON_HEIGHT
 )
 
-RATING_2_BUTTON: tuple = ui.rect(
-    RATING_BUTTONS_START_X + 1 * (RATING_BUTTON_WIDTH + RATING_BUTTON_GAP),
-    RATING_BUTTONS_Y,
-    RATING_BUTTON_WIDTH,
-    RATING_BUTTON_HEIGHT
+SCORE_2_BUTTON: tuple = ui.rect(
+    SCORE_BUTTONS_START_X + 1 * (SCORE_BUTTON_WIDTH + SCORE_BUTTON_GAP),
+    SCORE_BUTTONS_Y,
+    SCORE_BUTTON_WIDTH,
+    SCORE_BUTTON_HEIGHT
 )
 
-RATING_3_BUTTON: tuple = ui.rect(
-    RATING_BUTTONS_START_X + 2 * (RATING_BUTTON_WIDTH + RATING_BUTTON_GAP),
-    RATING_BUTTONS_Y,
-    RATING_BUTTON_WIDTH,
-    RATING_BUTTON_HEIGHT
+SCORE_3_BUTTON: tuple = ui.rect(
+    SCORE_BUTTONS_START_X + 2 * (SCORE_BUTTON_WIDTH + SCORE_BUTTON_GAP),
+    SCORE_BUTTONS_Y,
+    SCORE_BUTTON_WIDTH,
+    SCORE_BUTTON_HEIGHT
 )
 
-RATING_4_BUTTON: tuple = ui.rect(
-    RATING_BUTTONS_START_X + 3 * (RATING_BUTTON_WIDTH + RATING_BUTTON_GAP),
-    RATING_BUTTONS_Y,
-    RATING_BUTTON_WIDTH,
-    RATING_BUTTON_HEIGHT
+SCORE_4_BUTTON: tuple = ui.rect(
+    SCORE_BUTTONS_START_X + 3 * (SCORE_BUTTON_WIDTH + SCORE_BUTTON_GAP),
+    SCORE_BUTTONS_Y,
+    SCORE_BUTTON_WIDTH,
+    SCORE_BUTTON_HEIGHT
 )
 
-RATING_5_BUTTON: tuple = ui.rect(
-    RATING_BUTTONS_START_X + 4 * (RATING_BUTTON_WIDTH + RATING_BUTTON_GAP),
-    RATING_BUTTONS_Y,
-    RATING_BUTTON_WIDTH,
-    RATING_BUTTON_HEIGHT
+SCORE_5_BUTTON: tuple = ui.rect(
+    SCORE_BUTTONS_START_X + 4 * (SCORE_BUTTON_WIDTH + SCORE_BUTTON_GAP),
+    SCORE_BUTTONS_Y,
+    SCORE_BUTTON_WIDTH,
+    SCORE_BUTTON_HEIGHT
 )
 
 MODE_SWITCH_BUTTON_FILL_COLOR: int = 0x004040 # dark cyan
@@ -109,59 +111,63 @@ BUTTON_TEXT_COLOR: int = ui.COLOR_WHITE
 BUTTON_DISABLED_FILL_COLOR: int = 0x1a1a1a # very dark gray
 BUTTON_DISABLED_BORDER_COLOR: int = 0x333333 # dark gray
 BUTTON_DISABLED_TEXT_COLOR: int = 0x666666 # dim gray
-RATING_SELECTED_BORDER_COLOR: int = 0xFF0000 # bright red
-BUTTONS: tuple[tuple, ...] = [
+SCORE_SELECTED_BORDER_COLOR: int = 0xFF0000 # bright red
+BUTTONS: tuple[tuple, ...] = (
     MODE_SWITCH_BUTTON,
     NEXT_DAY_SWITCH_BUTTON,
     PREV_DAY_SWITCH_BUTTON,
     BACK_TO_DASHBOARD_BUTTON,
-    RATING_DIALOG_BUTTON,
-]
-BUTTONS_VISIBLE_WHILE_RANKING_DIALOG_IS_VISIBLE: tuple[tuple, ...] = [
-    RATING_1_BUTTON,
-    RATING_2_BUTTON,
-    RATING_3_BUTTON,
-    RATING_4_BUTTON,
-    RATING_5_BUTTON,
-    BACK_TO_DASHBOARD_BUTTON,
-    RATING_DIALOG_BUTTON,
-]
+    SCORE_DIALOG_BUTTON,
+)
+BUTTONS_VISIBLE_WHILE_SCORE_DIALOG_IS_VISIBLE: tuple[tuple, ...] = (
+    SCORE_1_BUTTON,
+    SCORE_2_BUTTON,
+    SCORE_3_BUTTON,
+    SCORE_4_BUTTON,
+    SCORE_5_BUTTON,
+    SCORE_DIALOG_BUTTON,
+)
 
 BIOMET_REQUEST_TIMEOUT_MS: int = 3000
 
 
 _mode: int = 0 # 0 => medical, 1 => personal
-_ranking_dialog_visible: bool = False
+_score_dialog_visible: bool = False
 _needs_redraw: bool = False
-_selected_rating: int = -1 # -1 = no rating, 1-5 = user's rating choice
+_selected_score: int = -1 # -1 = no score, 1-5 = user's score choice
 _last_biomet_request_timestamp: int = 0 # for timeout detection
+_waiting_for_image: bool = False
+_received_error_bytes: bool = False
 current_day_offset: int = 0 # -1 = yesterday, 0 = today, 1 = tomorrow
 _image_bytes: bytes | None = None
 
 
-def on_rating_received(topic: str, message: bytes):
-    global _selected_rating
+def on_score_received(topic: str, message: bytes):
+    global _selected_score
     try:
-        rating: int = int(message.decode('utf-8'))
-        if -1 <= rating <= 5:
-            _selected_rating = rating
-            print(f"[BIOMET] received rating for current day: {rating}")
+        score: int = int(message.decode('utf-8'))
+        if -1 <= score <= 5:
+            _selected_score = score
+            print(f"[BIOMET] received score for current day: {score}")
         else:
-            print(f"[BIOMET] invalid rating value: {rating}")
+            print(f"[BIOMET] invalid score value: {score}")
     except ValueError:
-        print(f"[BIOMET] failed to parse rating: {message.decode()}")
+        print(f"[BIOMET] failed to parse score: {message.decode()}")
 
 
 def on_image_received(topic: str, message: bytes):
-    global _image_bytes, _needs_redraw
+    global _image_bytes, _needs_redraw, _waiting_for_image, _received_error_bytes
+
+    _waiting_for_image = False
 
     if message.startswith(b"ERROR:"):
         print(f"[BIOMET] Worker failed to provide image: {message.decode()}")
-        # TODO: error display flag
+        _received_error_bytes = True
         return
 
     print(f"[BIOMET] received biomet image ({len(message)} bytes).")
     _image_bytes = message
+    _received_error_bytes = False
     _needs_redraw = True
 
 
@@ -189,17 +195,17 @@ def request_biomet(day_offset: int = 0):
 
 
 def initialize():
-    global _needs_redraw, _selected_rating
+    global _needs_redraw, _selected_score, _waiting_for_image
     display.use_canvas()
 
     mqtt.register_handler(BIOMET__MQTT_IMAGE_RECEIVE_TOPIC, on_image_received)
     mqtt.subscribe(BIOMET__MQTT_IMAGE_RECEIVE_TOPIC)
 
-    mqtt.register_handler(BIOMET__MQTT_RATING_RECEIVE_TOPIC, on_rating_received)
+    mqtt.register_handler(BIOMET__MQTT_RATING_RECEIVE_TOPIC, on_score_received)
     mqtt.subscribe(BIOMET__MQTT_RATING_RECEIVE_TOPIC)
 
     _needs_redraw = True
-    _selected_rating = -1
+    _selected_score = -1
     request_biomet(current_day_offset) # should remember last day and mode that user looked at
     mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_RATING_REQUEST_WORKER_TOPIC_SUFFIX}", f"{current_day_offset}")
 
@@ -222,26 +228,27 @@ def draw_received_image():
 
 
 def draw_buttons():
+    disabled: bool = _score_dialog_visible
     ui.draw_button(
         BACK_TO_DASHBOARD_BUTTON,
         label="BCK",
-        fill_color=BACK_TO_DASHBOARD_BUTTON_FILL_COLOR,
-        border_color=BACK_TO_DASHBOARD_BUTTON_BORDER_COLOR,
-        text_color=BUTTON_TEXT_COLOR,
+        fill_color=BUTTON_DISABLED_FILL_COLOR if disabled else BACK_TO_DASHBOARD_BUTTON_FILL_COLOR,
+        border_color=BUTTON_DISABLED_BORDER_COLOR if disabled else BACK_TO_DASHBOARD_BUTTON_BORDER_COLOR,
+        text_color=BUTTON_DISABLED_TEXT_COLOR if disabled else BUTTON_TEXT_COLOR,
         text_size=BUTTON_TEXT_SIZE
     )
 
-    disabled: bool = _ranking_dialog_visible
+    disabled = _score_dialog_visible
     ui.draw_button(
         MODE_SWITCH_BUTTON,
-        label="MED" if _mode == 0 else "DIG",
+        label="CUS" if _mode == 0 else "MED",
         fill_color=BUTTON_DISABLED_FILL_COLOR if disabled else MODE_SWITCH_BUTTON_FILL_COLOR,
         border_color=BUTTON_DISABLED_BORDER_COLOR if disabled else MODE_SWITCH_BUTTON_BORDER_COLOR,
         text_color=BUTTON_DISABLED_TEXT_COLOR if disabled else BUTTON_TEXT_COLOR,
         text_size=BUTTON_TEXT_SIZE
     )
 
-    disabled = _ranking_dialog_visible or current_day_offset >= 6
+    disabled = _score_dialog_visible or current_day_offset >= 6 or _waiting_for_image
     ui.draw_button(
         NEXT_DAY_SWITCH_BUTTON,
         label=">",
@@ -251,7 +258,7 @@ def draw_buttons():
         text_size=BUTTON_TEXT_SIZE
     )
 
-    disabled = _ranking_dialog_visible or current_day_offset <= -6
+    disabled = _score_dialog_visible or current_day_offset <= -6 or _waiting_for_image
     ui.draw_button(
         PREV_DAY_SWITCH_BUTTON,
         label="<",
@@ -261,53 +268,54 @@ def draw_buttons():
         text_size=BUTTON_TEXT_SIZE
     )
 
-    disabled = _ranking_dialog_visible or current_day_offset > 0
+    disabled = current_day_offset > 0
+    in_exit_mode: bool = _score_dialog_visible
     ui.draw_button(
-        RATING_DIALOG_BUTTON,
-        label="RTN" if _ranking_dialog_visible else "SCR",
-        fill_color=BUTTON_DISABLED_FILL_COLOR if disabled else RATING_DIALOG_BUTTON_FILL_COLOR,
-        border_color=BUTTON_DISABLED_BORDER_COLOR if disabled else RATING_DIALOG_BUTTON_BORDER_COLOR,
+        SCORE_DIALOG_BUTTON,
+        label="RTN" if _score_dialog_visible else "SCR",
+        fill_color=BUTTON_DISABLED_FILL_COLOR if disabled else SCORE_DIALOG_BUTTON_EXIT_FILL_COLOR if in_exit_mode else SCORE_DIALOG_BUTTON_FILL_COLOR,
+        border_color=BUTTON_DISABLED_BORDER_COLOR if disabled else SCORE_DIALOG_BUTTON_EXIT_BORDER_COLOR if in_exit_mode else SCORE_DIALOG_BUTTON_BORDER_COLOR,
         text_color=BUTTON_DISABLED_TEXT_COLOR if disabled else BUTTON_TEXT_COLOR,
         text_size=BUTTON_TEXT_SIZE
     )
 
 
-def draw_rating_dialog():
+def draw_score_dialog():
     display.draw_round_rect(
-        RATING_DIALOG[0],
-        RATING_DIALOG[1],
-        RATING_DIALOG[2],
-        RATING_DIALOG[3],
+        SCORE_DIALOG[0],
+        SCORE_DIALOG[1],
+        SCORE_DIALOG[2],
+        SCORE_DIALOG[3],
         radius=10,
-        color=RATING_DIALOG_FILL_COLOR,
+        color=SCORE_DIALOG_FILL_COLOR,
         fill=True
     )
     display.draw_round_rect(
-        RATING_DIALOG[0],
-        RATING_DIALOG[1],
-        RATING_DIALOG[2],
-        RATING_DIALOG[3],
+        SCORE_DIALOG[0],
+        SCORE_DIALOG[1],
+        SCORE_DIALOG[2],
+        SCORE_DIALOG[3],
         radius=10,
-        color=RATING_DIALOG_BORDER_COLOR
+        color=SCORE_DIALOG_BORDER_COLOR
     )
 
     display.draw_text(
-        "Rate how you feel today:",
-        x=ui.center_x(RATING_DIALOG),
-        y=RATING_DIALOG[1] + 20,
-        size=RATING_DIALOG_TEXT_SIZE,
+        "Rate how you felt:",
+        x=ui.center_x(SCORE_DIALOG),
+        y=SCORE_DIALOG[1] + 20,
+        size=SCORE_DIALOG_TEXT_SIZE,
         anchor=display.TOP_CENTER,
-        color=RATING_DIALOG_TEXT_COLOR,
-        background_color=RATING_DIALOG_FILL_COLOR
+        color=SCORE_DIALOG_TEXT_COLOR,
+        background_color=SCORE_DIALOG_FILL_COLOR
     )
 
-    for index, rating_button in enumerate([RATING_1_BUTTON, RATING_2_BUTTON, RATING_3_BUTTON, RATING_4_BUTTON, RATING_5_BUTTON]):
-        is_selected: bool = (_selected_rating == (index + 1))
+    for index, score_button in enumerate([SCORE_1_BUTTON, SCORE_2_BUTTON, SCORE_3_BUTTON, SCORE_4_BUTTON, SCORE_5_BUTTON]):
+        is_selected: bool = (_selected_score == (index + 1))
         ui.draw_button(
-            rating_button,
+            score_button,
             label=str(index+1),
-            fill_color=RATING_DIALOG_BUTTON_FILL_COLOR,
-            border_color=RATING_SELECTED_BORDER_COLOR if is_selected else RATING_DIALOG_BUTTON_BORDER_COLOR,
+            fill_color=SCORE_DIALOG_BUTTON_FILL_COLOR,
+            border_color=SCORE_SELECTED_BORDER_COLOR if is_selected else SCORE_DIALOG_BUTTON_BORDER_COLOR,
             text_color=BUTTON_TEXT_COLOR,
             text_size=BUTTON_TEXT_SIZE
         )
@@ -315,7 +323,7 @@ def draw_rating_dialog():
 
 def draw_date():
     display.draw_text(
-        f"{localtime.year()}.{localtime.month():02d}.{localtime.day():02d}",
+        localtime.date_string(current_day_offset),
         x=ui.SCREEN_PADDING,
         y=display.HEIGHT-ui.SCREEN_PADDING-16,
         size=2.0,
@@ -325,13 +333,13 @@ def draw_date():
 
 
 def handle_touch():
-    global _mode, _ranking_dialog_visible, current_day_offset, _needs_redraw, _selected_rating
+    global _mode, _score_dialog_visible, current_day_offset, _needs_redraw, _selected_score
     if not touch.is_pressed():
         return
 
     x, y = touch.position()
 
-    if not _ranking_dialog_visible:
+    if not _score_dialog_visible:
         touched_button_index: int = ui.is_inside_which(x, y, BUTTONS)
 
         if touched_button_index == -1: # no button touched
@@ -340,79 +348,79 @@ def handle_touch():
             _mode = 1 - _mode
             request_biomet(current_day_offset)
             mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_RATING_REQUEST_WORKER_TOPIC_SUFFIX}", f"{current_day_offset}")
-        elif touched_button_index == 1 and touch.was_pressed() and current_day_offset < 6: # NEXT_DAY_SWITCH_BUTTON
+        elif touched_button_index == 1 and touch.was_pressed() and current_day_offset < 6 and not _waiting_for_image: # NEXT_DAY_SWITCH_BUTTON
             current_day_offset += 1
             request_biomet(current_day_offset)
+            _needs_redraw = True
             mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_RATING_REQUEST_WORKER_TOPIC_SUFFIX}", f"{current_day_offset}")
-        elif touched_button_index == 2 and touch.was_pressed() and current_day_offset > -6: # PREV_DAY_SWITCH_BUTTON
+        elif touched_button_index == 2 and touch.was_pressed() and current_day_offset > -6 and not _waiting_for_image: # PREV_DAY_SWITCH_BUTTON
             current_day_offset -= 1
             request_biomet(current_day_offset)
+            _needs_redraw = True
             mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_RATING_REQUEST_WORKER_TOPIC_SUFFIX}", f"{current_day_offset}")
         elif touched_button_index == 3 and touch.was_pressed(): # BACK_TO_DASHBOARD_BUTTON
             router.request_module_switch("dashboard")
-        elif touched_button_index == 4 and touch.was_pressed() and current_day_offset <= 0: # RATING_DIALOG_BUTTON
-            _ranking_dialog_visible = True
+        elif touched_button_index == 4 and touch.was_pressed() and current_day_offset <= 0: # SCORE_DIALOG_BUTTON
+            _score_dialog_visible = True
             _needs_redraw = True
     else:
-        touched_button_index: int = ui.is_inside_which(x, y, BUTTONS_VISIBLE_WHILE_RANKING_DIALOG_IS_VISIBLE)
+        touched_button_index: int = ui.is_inside_which(x, y, BUTTONS_VISIBLE_WHILE_SCORE_DIALOG_IS_VISIBLE)
 
         if touched_button_index == -1: # no button touched
             common.set_brightness_from_vertical_position(y)
-        elif touched_button_index == 0 and touch.was_pressed(): # RATING_1_BUTTON
-            mqtt.send_message(BIOMET__MQTT_RATING_SEND_WORKER_TOPIC_SUFFIX, f"1:{current_day_offset}")
-            _selected_rating = 1
-            _ranking_dialog_visible = False
+        elif touched_button_index == 0 and touch.was_pressed(): # SCORE_1_BUTTON
+            mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_RATING_SEND_WORKER_TOPIC_SUFFIX}", f"1:{current_day_offset}")
+            _selected_score = 1
+            _score_dialog_visible = False
             _needs_redraw = True
             print("[BIOMET] user rated 1.")
-        elif touched_button_index == 1 and touch.was_pressed(): # RATING_2_BUTTON
-            mqtt.send_message(BIOMET__MQTT_RATING_SEND_WORKER_TOPIC_SUFFIX, f"2:{current_day_offset}")
-            _selected_rating = 2
-            _ranking_dialog_visible = False
+        elif touched_button_index == 1 and touch.was_pressed(): # SCORE_2_BUTTON
+            mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_RATING_SEND_WORKER_TOPIC_SUFFIX}", f"2:{current_day_offset}")
+            _selected_score = 2
+            _score_dialog_visible = False
             _needs_redraw = True
             print("[BIOMET] user rated 2.")
-        elif touched_button_index == 2 and touch.was_pressed(): # RATING_3_BUTTON
-            mqtt.send_message(BIOMET__MQTT_RATING_SEND_WORKER_TOPIC_SUFFIX, f"3:{current_day_offset}")
-            _selected_rating = 3
-            _ranking_dialog_visible = False
+        elif touched_button_index == 2 and touch.was_pressed(): # SCORE_3_BUTTON
+            mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_RATING_SEND_WORKER_TOPIC_SUFFIX}", f"3:{current_day_offset}")
+            _selected_score = 3
+            _score_dialog_visible = False
             _needs_redraw = True
             print("[BIOMET] user rated 3.")
-        elif touched_button_index == 3 and touch.was_pressed(): # RATING_4_BUTTON
-            mqtt.send_message(BIOMET__MQTT_RATING_SEND_WORKER_TOPIC_SUFFIX, f"4:{current_day_offset}")
-            _selected_rating = 4
-            _ranking_dialog_visible = False
+        elif touched_button_index == 3 and touch.was_pressed(): # SCORE_4_BUTTON
+            mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_RATING_SEND_WORKER_TOPIC_SUFFIX}", f"4:{current_day_offset}")
+            _selected_score = 4
+            _score_dialog_visible = False
             _needs_redraw = True
             print("[BIOMET] user rated 4.")
-        elif touched_button_index == 4 and touch.was_pressed(): # RATING_5_BUTTON
-            mqtt.send_message(BIOMET__MQTT_RATING_SEND_WORKER_TOPIC_SUFFIX, f"5:{current_day_offset}")
-            _selected_rating = 5
-            _ranking_dialog_visible = False
+        elif touched_button_index == 4 and touch.was_pressed(): # SCORE_5_BUTTON
+            mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_RATING_SEND_WORKER_TOPIC_SUFFIX}", f"5:{current_day_offset}")
+            _selected_score = 5
+            _score_dialog_visible = False
             _needs_redraw = True
             print("[BIOMET] user rated 5.")
-        elif touched_button_index == 5 and touch.was_pressed(): # BACK_TO_DASHBOARD_BUTTON
-            router.request_module_switch("dashboard")
-        elif touched_button_index == 6 and touch.was_pressed(): # RATING_DIALOG_BUTTON
-            _ranking_dialog_visible = False
+        elif touched_button_index == 5 and touch.was_pressed(): # SCORE_DIALOG_BUTTON
+            _score_dialog_visible = False
             _needs_redraw = True
 
 
 def update():
-    global _needs_redraw, _image_bytes, _selected_rating, current_day_offset
+    global _needs_redraw, _image_bytes, _selected_score, current_day_offset
 
     handle_touch()
 
-    # if during biomet fetch and didnt receive it yet
+    # if received nodata error flag OR during biomet fetch and didnt receive it yet
     show_data_missing: bool = False
-    if _image_bytes is None and _last_biomet_request_timestamp > 0:
-        time_since_request = time.ticks_diff(time.ticks_ms(), _last_biomet_request_timestamp)
+    if _received_error_bytes:
+        show_data_missing = True
+    if _waiting_for_image and _last_biomet_request_timestamp > 0:
+        time_since_request: int = time.ticks_diff(time.ticks_ms(), _last_biomet_request_timestamp)
         if time_since_request > BIOMET_REQUEST_TIMEOUT_MS:
             show_data_missing = True
 
-    if (_needs_redraw or show_data_missing) and (_image_bytes is not None or show_data_missing):
+    if _needs_redraw or show_data_missing:
         display.clear_canvas()
-        
-        if _image_bytes is not None:
-            draw_received_image()
-        else:
+
+        if show_data_missing or _image_bytes is None:
             display.draw_text(
                 "Data missing",
                 x=display.WIDTH // 2,
@@ -421,12 +429,14 @@ def update():
                 anchor=display.MIDDLE_CENTER,
                 color=ui.COLOR_WHITE
             )
+        else:
+            draw_received_image()
         
         draw_buttons()
         draw_date()
 
-        if _ranking_dialog_visible:
-            draw_rating_dialog()
+        if _score_dialog_visible:
+            draw_score_dialog()
 
         display.flush_canvas()
         # TODO: gc.collect() call after drawing ?
