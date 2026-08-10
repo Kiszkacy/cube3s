@@ -7,6 +7,7 @@ M5.begin()
 import gc
 import time
 
+import router
 import localtime
 import mqtt
 import power
@@ -37,7 +38,6 @@ MODULES: dict = {
 # TODO: implement helper time module and daily reset logic
 
 _current_module: str | None = None
-_pending_module: str | None = None
 
 _next_memory_status_timestamp: int = 0
 
@@ -61,23 +61,24 @@ def on_module_switch(topic: str, message: bytes):
     # this runs inside mqtt.check_if_any_message(), so it must not touch the socket itself.
     # initialize()/deinitialize() call subscribe()/unsubscribe(), which would re-enter the blocking
     # receive loop and can either hang the main loop or trip its packet id assert
-    global _pending_module
     # TODO: this could crash if message was not a string
     module_name: str = message.decode('utf-8')
     if module_name not in MODULES:
         print(f"[MAIN.ROUTER] received unknown module switch request: '{module_name}'.")
         return
 
-    _pending_module = module_name
+    router.request_module_switch(module_name)
 
 
 def apply_pending_module_switch():
-    global _current_module, _pending_module
-    if _pending_module is None:
+    global _current_module
+    target: str | None = router.consume_pending_module_switch()
+    if target is None:
         return
 
-    target: str = _pending_module
-    _pending_module = None
+    if target not in MODULES:
+        print(f"[MAIN.ROUTER] ignoring unknown module switch request: '{target}'.")
+        return
 
     if target == _current_module:
         return
