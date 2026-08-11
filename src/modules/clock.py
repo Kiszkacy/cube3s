@@ -6,6 +6,7 @@ import localtime
 import mqtt
 import common
 import power
+import router
 import speaker
 import touch
 import ui
@@ -57,9 +58,16 @@ SWITCH_BUTTON: tuple = ui.rect(
     36
 )
 SWITCH_BUTTON_FILL_COLOR: int = 0x004040 # dark cyan
-SWITCH_BUTTON_BORDER_COLOR: int = COLOR_WHITE
-SWITCH_BUTTON_TEXT_SIZE: float = 2.0
-SWITCH_BUTTON_TEXT_COLOR: int = COLOR_WHITE
+BACK_TO_DASHBOARD_BUTTON: tuple = ui.rect(
+    ui.SCREEN_PADDING,
+    ui.SCREEN_PADDING,
+    44,
+    36
+)
+BACK_TO_DASHBOARD_BUTTON_FILL_COLOR: int = 0x400000 # dark red
+BUTTON_BORDER_COLOR: int = COLOR_WHITE
+BUTTON_TEXT_COLOR: int = COLOR_WHITE
+BUTTON_TEXT_SIZE: float = 2.0
 
 TOUCH_INACTIVITY_TIMEOUT_MS: int = 10000
 
@@ -149,11 +157,12 @@ def handle_touch():
         return
 
     x, y = touch.position()
-    if ui.is_inside(x, y, SWITCH_BUTTON):
+    if ui.is_inside(x, y, SWITCH_BUTTON) and touch.was_pressed():
         # inside switch button => switch mode
-        if touch.was_pressed():
-            _mode = 1 - _mode
-            speaker.beep()
+        _mode = 1 - _mode
+        speaker.beep()
+    elif ui.is_inside(x, y, BACK_TO_DASHBOARD_BUTTON) and touch.was_pressed():
+        router.request_module_switch("dashboard")
     else:
         # outside switch button => adjust brightness
         common.set_brightness_from_vertical_position(y)
@@ -279,14 +288,23 @@ def draw_battery():
         )
 
 
-def draw_switch_mode_button():
+def draw_buttons():
     ui.draw_button(
         SWITCH_BUTTON,
         label="ANA" if _mode == 0 else "DIG",
         fill_color=SWITCH_BUTTON_FILL_COLOR,
-        border_color=SWITCH_BUTTON_BORDER_COLOR,
-        text_color=SWITCH_BUTTON_TEXT_COLOR,
-        text_size=SWITCH_BUTTON_TEXT_SIZE
+        border_color=BUTTON_BORDER_COLOR,
+        text_color=BUTTON_TEXT_COLOR,
+        text_size=BUTTON_TEXT_SIZE
+    )
+
+    ui.draw_button(
+        BACK_TO_DASHBOARD_BUTTON,
+        label="BCK",
+        fill_color=BACK_TO_DASHBOARD_BUTTON_FILL_COLOR,
+        border_color=BUTTON_BORDER_COLOR,
+        text_color=BUTTON_TEXT_COLOR,
+        text_size=BUTTON_TEXT_SIZE
     )
 
 
