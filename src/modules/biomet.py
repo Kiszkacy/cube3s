@@ -140,6 +140,7 @@ _waiting_for_image: bool = False
 _received_error_bytes: bool = False
 current_day_offset: int = 0 # -1 = yesterday, 0 = today, 1 = tomorrow
 _image_bytes: bytes | None = None
+_showing_data_missing: bool = False
 
 
 def on_score_received(topic: str, message: bytes):
@@ -404,7 +405,7 @@ def handle_touch():
 
 
 def update():
-    global _needs_redraw, _image_bytes, _selected_score, current_day_offset
+    global _needs_redraw, _image_bytes, _selected_score, current_day_offset, _showing_data_missing
 
     handle_touch()
 
@@ -417,7 +418,7 @@ def update():
         if time_since_request > BIOMET_REQUEST_TIMEOUT_MS:
             show_data_missing = True
 
-    if _needs_redraw or show_data_missing:
+    if _needs_redraw or (show_data_missing and not _showing_data_missing):
         display.clear_canvas()
 
         if show_data_missing or _image_bytes is None:
@@ -429,7 +430,9 @@ def update():
                 anchor=display.MIDDLE_CENTER,
                 color=ui.COLOR_WHITE
             )
+            _showing_data_missing = True
         else:
+            _showing_data_missing = False
             draw_received_image()
         
         draw_buttons()
