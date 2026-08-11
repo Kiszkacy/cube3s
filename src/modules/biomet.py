@@ -417,7 +417,6 @@ def update():
 
     handle_touch()
 
-    # if received nodata error flag OR during biomet fetch and didnt receive it yet
     if _image_state == IMAGE_STATE_WAITING and _last_biomet_request_timestamp != -1:
         time_since_request: int = time.ticks_diff(time.ticks_ms(), _last_biomet_request_timestamp)
         if time_since_request > BIOMET_REQUEST_TIMEOUT_MS:
