@@ -128,14 +128,14 @@ BUTTONS_VISIBLE_WHILE_SCORE_DIALOG_IS_VISIBLE: tuple[tuple, ...] = (
     SCORE_DIALOG_BUTTON,
 )
 
-BIOMET_REQUEST_TIMEOUT_MS: int = 3000
+BIOMET_REQUEST_TIMEOUT_MS: int = 1500
 
 
 _mode: int = 0 # 0 => medical, 1 => personal
 _score_dialog_visible: bool = False
 _needs_redraw: bool = False
 _selected_score: int = -1 # -1 = no score, 1-5 = user's score choice
-_last_biomet_request_timestamp: int = 0 # for timeout detection
+_last_biomet_request_timestamp: int = -1 # for timeout detection
 _waiting_for_image: bool = False
 _received_error_bytes: bool = False
 current_day_offset: int = 0 # -1 = yesterday, 0 = today, 1 = tomorrow
@@ -157,9 +157,10 @@ def on_score_received(topic: str, message: bytes):
 
 
 def on_image_received(topic: str, message: bytes):
-    global _image_bytes, _needs_redraw, _waiting_for_image, _received_error_bytes
+    global _image_bytes, _needs_redraw, _waiting_for_image, _received_error_bytes, _last_biomet_request_timestamp
 
     _waiting_for_image = False
+    _last_biomet_request_timestamp = -1
 
     if message.startswith(b"ERROR:"):
         print(f"[BIOMET] Worker failed to provide image: {message.decode()}")
@@ -189,6 +190,9 @@ def request_personal_biomet(day_offset: int = 0):
 
 
 def request_biomet(day_offset: int = 0):
+    global _waiting_for_image, _received_error_bytes
+    _received_error_bytes = False
+    _waiting_for_image = True
     if _mode == 0:
         request_medical_biomet(day_offset)
     else:
@@ -348,6 +352,7 @@ def handle_touch():
         elif touched_button_index == 0 and touch.was_pressed(): # MODE_SWITCH_BUTTON
             _mode = 1 - _mode
             request_biomet(current_day_offset)
+            _needs_redraw = True
             mqtt.send_message(f"{MQTT__WORKER_TOPIC}{BIOMET__MQTT_RATING_REQUEST_WORKER_TOPIC_SUFFIX}", f"{current_day_offset}")
         elif touched_button_index == 1 and touch.was_pressed() and current_day_offset < 6 and not _waiting_for_image: # NEXT_DAY_SWITCH_BUTTON
             current_day_offset += 1
@@ -405,7 +410,7 @@ def handle_touch():
 
 
 def update():
-    global _needs_redraw, _image_bytes, _selected_score, current_day_offset, _showing_data_missing
+    global _needs_redraw, _image_bytes, _selected_score, current_day_offset, _showing_data_missing, _waiting_for_image
 
     handle_touch()
 
@@ -413,10 +418,11 @@ def update():
     show_data_missing: bool = False
     if _received_error_bytes:
         show_data_missing = True
-    if _waiting_for_image and _last_biomet_request_timestamp > 0:
+    if _waiting_for_image and _last_biomet_request_timestamp != -1:
         time_since_request: int = time.ticks_diff(time.ticks_ms(), _last_biomet_request_timestamp)
         if time_since_request > BIOMET_REQUEST_TIMEOUT_MS:
             show_data_missing = True
+            _waiting_for_image = False
 
     if _needs_redraw or (show_data_missing and not _showing_data_missing):
         display.clear_canvas()
