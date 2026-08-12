@@ -37,7 +37,7 @@ MODULES: dict = {
 
 # TODO: implement helper time module and daily reset logic
 
-_current_module: str | None = None
+_current_module: str | None = "dashboard"
 
 _next_memory_status_timestamp: int = 0
 
