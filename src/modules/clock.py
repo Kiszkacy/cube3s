@@ -331,6 +331,6 @@ def update():
 
         if _awake:
             draw_battery()
-            draw_switch_mode_button()
+            draw_buttons()
 
         display.flush_canvas()
