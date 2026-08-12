@@ -1,5 +1,7 @@
 import M5 # type: ignore
 
+import display
+
 # IMPORTANT: has to run before every other import
 # so any global variables in the other modules that use M5 are initialized correctly
 M5.begin()
@@ -101,6 +103,7 @@ mqtt.connect()
 mqtt.register_handler(MQTT__MODULE_SWITCH_TOPIC, on_module_switch)
 mqtt.subscribe(MQTT__MODULE_SWITCH_TOPIC)
 
+display._display.setRotation(3)
 print("[MAIN] starting main loop.")
 # TODO: measure frame time and loop execution time
 while True:
