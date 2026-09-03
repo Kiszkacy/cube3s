@@ -24,9 +24,6 @@ def _is_daytime() -> bool:
 def _target_state() -> str | None:
     # humidifier only turns ON during daytime,
     # ON when humidity is below MIN, OFF above MAX, do nothing if its inbetween
-    if not _is_daytime():
-        return OFF_MESSAGE
-
     humidity: float = env.humidity()
     if humidity < SERVICE__HUMIDIFIER_HUMIDITY_MIN:
         return ON_MESSAGE
@@ -48,6 +45,15 @@ def deinitialize():
 def update():
     global _last_sent_state
     if not env.is_available():
+        return
+
+    if localtime.hour_changed() and localtime.hour() == SERVICE__HUMIDIFIER_DAY_END_HOUR:
+        mqtt.send_message(SERVICE__HUMIDIFIER_POWER_TOPIC, OFF_MESSAGE)
+        _last_sent_state = OFF_MESSAGE
+        print(f"[HUMIDIFIER] turning humidifier OFF.")
+        return
+
+    if not _is_daytime():
         return
 
     target: str | None = _target_state()
