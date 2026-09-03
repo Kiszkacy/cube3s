@@ -1,8 +1,10 @@
 import auto_brightness
+import humidifier
 
 
 _AVAILABLE_SERVICES: dict[str, object] = {
     "auto_brightness": auto_brightness,
+    "humidifier": humidifier,
 }
 
 

@@ -1,4 +1,5 @@
 import display
+import env
 import localtime
 import mqtt
 import router
@@ -8,7 +9,7 @@ from config import DASHBOARD__MQTT_INPUT_TOPIC
 from ui import COLOR_WHITE
 
 
-SERVICES: tuple[str, ...] = ("auto_brightness",)
+SERVICES: tuple[str, ...] = ("auto_brightness", "humidifier")
 
 
 DASHBOARD_PADDING: int = 8
@@ -58,6 +59,11 @@ DIGITAL_CLOCK_TEXT_X: int = CLOCK_AREA_CENTER_X
 DIGITAL_CLOCK_TEXT_Y: int = CLOCK_AREA_CENTER_Y
 DIGITAL_CLOCK_SECONDS_TEXT_X: int = CLOCK_AREA_CENTER_X + 90
 DIGITAL_CLOCK_SECONDS_TEXT_Y: int = CLOCK_AREA_CENTER_Y + 10
+
+TEMPERATURE_TEXT_SIZE: float = 2.0
+TEMPERATURE_TEXT_COLOR: int = COLOR_WHITE
+TEMPERATURE_TEXT_X: int = display.WIDTH - DASHBOARD_PADDING
+TEMPERATURE_TEXT_Y: int = DASHBOARD_PADDING
 
 
 _previous_second: int = -1
@@ -119,6 +125,20 @@ def draw_bottom_buttons():
     ui.draw_button(BUTTON_CAMERA, label="CAM")
 
 
+def draw_temperature_and_humidity():
+    if not env.is_available():
+        return
+
+    display.draw_text(
+        f"{env.temperature():.1f}C  {env.humidity():.0f}%",
+        x=TEMPERATURE_TEXT_X,
+        y=TEMPERATURE_TEXT_Y,
+        size=TEMPERATURE_TEXT_SIZE,
+        anchor=display.TOP_RIGHT,
+        color=TEMPERATURE_TEXT_COLOR
+    )
+
+
 def handle_touch():
     if not touch.is_pressed() or not touch.was_pressed():
         return
@@ -146,6 +166,7 @@ def update():
         display.clear_canvas()
 
         draw_digital_clock()
+        draw_temperature_and_humidity()
         draw_bottom_buttons()
 
         display.flush_canvas()
