@@ -9,14 +9,16 @@ M5.begin()
 import gc
 import time
 
-import router
-import services
+import env
 import localtime
 import mqtt
 import power
+import router
+import services
 import touch
 import version
 import wifi
+
 import biomet, clock, dashboard, live_camera
 from config import MQTT__MODULE_SWITCH_TOPIC
 
@@ -112,9 +114,10 @@ while True:
     try:
         M5.update()
         # IMPORTANT: sampled once per iteration, every module reads the sampled values instead of polling on its own
-        localtime.update()
         touch.update()
+        localtime.update()
         power.update()
+        env.update()
 
         wifi.check_connection_reconnect_if_needed()
         mqtt.check_connection_reconnect_if_needed()
