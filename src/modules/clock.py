@@ -14,6 +14,9 @@ from config import CLOCK__MQTT_BRIGHTNESS_SWITCH_TOPIC, CLOCK__MQTT_MODE_SWITCH_
 from ui import COLOR_WHITE
 
 
+SERVICES: tuple[str, ...] = ("auto_brightness",)
+
+
 DIGITAL_CLOCK_TEXT_SIZE: float = 10.0
 DIGITAL_CLOCK_SECONDS_TEXT_SIZE: float = 4.0
 DIGITAL_CLOCK_COLOR: int = COLOR_WHITE

@@ -10,6 +10,7 @@ import gc
 import time
 
 import router
+import services
 import localtime
 import mqtt
 import power
@@ -90,6 +91,7 @@ def apply_pending_module_switch():
         _current_module = None # until new module is initialized
 
     MODULES[target].initialize()
+    services.set_active_services(MODULES[target].SERVICES)
     _current_module = target
     print(f"[MAIN.ROUTER] switched to module: '{_current_module}'.")
 
@@ -119,6 +121,7 @@ while True:
         mqtt.check_if_any_message()
         mqtt.ping_if_needed()
         apply_pending_module_switch()
+        services.update()
 
         if _current_module:
             MODULES[_current_module].update()

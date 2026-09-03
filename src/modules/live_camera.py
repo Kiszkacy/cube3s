@@ -4,6 +4,9 @@ import touch
 import common
 
 
+SERVICES: tuple[str, ...] = ()
+
+
 _printed_error_message: bool = False
 
 

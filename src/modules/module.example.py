@@ -1,6 +1,10 @@
 # imports
 
 
+# optional, shared services to enable while this module is active
+SERVICES: tuple[str, ...] = ()
+
+
 # consts
 
 

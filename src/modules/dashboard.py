@@ -8,6 +8,9 @@ from config import DASHBOARD__MQTT_INPUT_TOPIC
 from ui import COLOR_WHITE
 
 
+SERVICES: tuple[str, ...] = ("auto_brightness",)
+
+
 DASHBOARD_PADDING: int = 8
 
 BOTTOM_PANEL_COLS: int = 5
