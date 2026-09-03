@@ -9,11 +9,11 @@ from config import (
 
 
 def initialize():
-    pass
+    print("[AUTO-BRIGHTNESS] initialized.")
 
 
 def deinitialize():
-    pass
+    print("[AUTO-BRIGHTNESS] deinitialized.")
 
 
 def update():
