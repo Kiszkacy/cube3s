@@ -3,6 +3,8 @@ import time
 from hardware import I2C, Pin # type: ignore
 from unit import ENVUnit # type: ignore
 
+from config import ENV__HUMIDITY_OFFSET, ENV__TEMPERATURE_OFFSET
+
 # IMPORTANT: every getter here returns the value sampled by update(), a __RS variant reads the value immediately
 
 # CoreS3 PORT.A (red, next to USB-C): SCL = GPIO1, SDA = GPIO2
@@ -31,8 +33,8 @@ def resample():
     _next_sample_timestamp = time.ticks_add(time.ticks_ms(), SAMPLE_INTERVAL_MS)
 
     try:
-        _temperature = _env.read_temperature()
-        _humidity = _env.read_humidity()
+        _temperature = _env.read_temperature() + ENV__TEMPERATURE_OFFSET
+        _humidity = _env.read_humidity() + ENV__HUMIDITY_OFFSET
         _pressure = _env.read_pressure()
         if not _available:
             print("[ENV] sensor available.")
@@ -73,7 +75,7 @@ def temperature() -> float: # celsius
 
 def temperature__RS() -> float:
     global _temperature
-    _temperature = _env.read_temperature()
+    _temperature = _env.read_temperature() + ENV__TEMPERATURE_OFFSET
     return _temperature
 
 
@@ -83,7 +85,7 @@ def humidity() -> float: # percent relative humidity
 
 def humidity__RS() -> float:
     global _humidity
-    _humidity = _env.read_humidity()
+    _humidity = _env.read_humidity() + ENV__HUMIDITY_OFFSET
     return _humidity
 
 

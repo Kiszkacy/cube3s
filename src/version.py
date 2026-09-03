@@ -2,7 +2,7 @@
 
 MAJOR: int = 2 # bumped by hand on new features
 MINOR: int = 0 # bumped by hand on fixes
-BUILD: int = 90
+BUILD: int = 92
 
 
 VERSION: str = f"{MAJOR}.{MINOR}.{BUILD}"
